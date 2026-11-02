@@ -1,0 +1,242 @@
+/* Full-screen product popup. The see-through gap around the panel shows
+   the (dimmed, blurred) page behind it. */
+.pmodal {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  padding: clamp(10px, 2.4vw, 30px);
+  padding-top: max(clamp(10px, 2.4vw, 30px), env(safe-area-inset-top, 0px));
+  padding-bottom: max(clamp(10px, 2.4vw, 30px), env(safe-area-inset-bottom, 0px));
+  background: rgba(var(--c-shade-rgb), 0.5);
+  -webkit-backdrop-filter: blur(8px) saturate(120%);
+  backdrop-filter: blur(8px) saturate(120%);
+  animation: pmodal-fade-in 0.35s ease both;
+}
+
+.pmodal-panel {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--c-bg-elevated);
+  color: var(--c-text);
+  border: 1px solid var(--c-border);
+  border-radius: 10px;
+  box-shadow: 0 30px 80px -20px rgba(var(--c-shade-rgb), 0.6);
+  outline: none;
+  animation: pmodal-rise 0.6s var(--ease-apple) both;
+}
+
+/* Closing (length = MODAL_CLOSE_MS in constants/site.ts) */
+.pmodal.is-closing {
+  animation: pmodal-fade-out 0.26s ease forwards;
+}
+
+.pmodal.is-closing .pmodal-panel {
+  animation: pmodal-sink 0.26s ease forwards;
+}
+
+/* ---------- Top bar ---------- */
+.pmodal-bar {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 18px;
+  padding: 14px clamp(16px, 3vw, 34px);
+  background: rgba(var(--c-bg-rgb), 0.82);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--c-line);
+}
+
+.pmodal-back,
+.pmodal-close {
+  border: 1px solid var(--c-border-strong);
+  background: transparent;
+  color: var(--c-text);
+  transition:
+    background 0.25s ease,
+    color 0.25s ease;
+}
+
+.pmodal-back {
+  padding: 10px 16px;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+}
+
+.pmodal-close {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.pmodal-back:hover,
+.pmodal-close:hover {
+  background: var(--c-inverse);
+  color: var(--c-on-inverse);
+}
+
+/* Breadcrumb of opened products (desktop) */
+.pmodal-trail {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow: hidden;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  color: var(--c-subtle);
+}
+
+.pmodal-trail li {
+  flex: 0 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pmodal-trail li + li::before {
+  content: '/';
+  margin-right: 10px;
+  color: var(--c-border-input);
+}
+
+.pmodal-trail li[aria-current] {
+  flex-shrink: 0;
+  color: var(--c-text);
+}
+
+/* Stack depth dots (phones) */
+.pmodal-dots {
+  display: none;
+  justify-content: center;
+  gap: 6px;
+}
+
+.pmodal-dots i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--c-border-input);
+  transition:
+    width 0.4s var(--ease-apple),
+    background 0.4s ease;
+}
+
+.pmodal-dots i.is-current {
+  width: 18px;
+  border-radius: 3px;
+  background: var(--c-text);
+}
+
+/* ---------- Content ---------- */
+.pmodal-content {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 30px clamp(16px, 4.5vw, 64px) 70px;
+}
+
+.pmodal-content.from-push {
+  animation: pmodal-slide-from-right 0.6s var(--ease-apple) both;
+}
+
+.pmodal-content.from-pop {
+  animation: pmodal-slide-from-left 0.6s var(--ease-apple) both;
+}
+
+@keyframes pmodal-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes pmodal-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes pmodal-rise {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.97);
+  }
+}
+
+@keyframes pmodal-sink {
+  to {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+}
+
+@keyframes pmodal-slide-from-right {
+  from {
+    opacity: 0;
+    transform: translateX(48px);
+  }
+}
+
+@keyframes pmodal-slide-from-left {
+  from {
+    opacity: 0;
+    transform: translateX(-48px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pmodal,
+  .pmodal-panel,
+  .pmodal-content {
+    animation-duration: 0.01s !important;
+  }
+}
+
+@media (max-width: 700px) {
+  .pmodal {
+    padding-inline: 8px;
+  }
+
+  .pmodal-panel {
+    border-radius: 12px;
+  }
+
+  .pmodal-bar {
+    gap: 10px;
+    padding: 10px 12px;
+  }
+
+  .pmodal-back {
+    padding: 9px 12px;
+    font-size: 9px;
+  }
+
+  .pmodal-close {
+    width: 34px;
+    height: 34px;
+  }
+
+  .pmodal-trail {
+    display: none;
+  }
+
+  .pmodal-dots {
+    display: flex;
+  }
+
+  .pmodal-content {
+    padding: 18px 4.5vw 50px;
+  }
+}

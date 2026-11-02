@@ -1,0 +1,50 @@
+.recs {
+  --card-w: auto;
+  --card-hover-scale: 1.08;
+
+  margin-top: clamp(48px, 7vw, 80px);
+  padding-top: 34px;
+  border-top: 1px solid var(--c-line);
+}
+
+.recs h2 {
+  font-size: clamp(20px, 2.4vw, 28px);
+  font-weight: 400;
+  letter-spacing: 0.22em;
+  margin: 12px 0 8px;
+}
+
+.recs-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 26px clamp(14px, 2vw, 26px);
+  /* Room for hover growth */
+  padding-block: 20px;
+}
+
+/* Phones: swipeable row that snaps one card at a time */
+@media (max-width: 700px) {
+  .recs {
+    --card-w: 46vw;
+  }
+
+  .recs-list {
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    margin-inline: -4.5vw;
+    padding-inline: 4.5vw;
+    scroll-padding-inline: 4.5vw;
+    scrollbar-width: none;
+  }
+
+  .recs-list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .recs-list .product-card {
+    scroll-snap-align: start;
+  }
+}

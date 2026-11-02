@@ -1,0 +1,335 @@
+/* Shared by the product page and the product popup. */
+.product-detail-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.12fr) minmax(300px, 0.88fr);
+  gap: clamp(30px, 6vw, 82px);
+  align-items: start;
+}
+
+/* ---------- Gallery ---------- */
+.product-detail-main-photo {
+  width: 100%;
+  aspect-ratio: 0.92;
+  object-fit: cover;
+  display: block;
+  background: var(--c-bg-input);
+}
+
+.product-detail-thumbs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 9px;
+  margin-top: 10px;
+}
+
+.product-detail-thumb {
+  padding: 0;
+  border: 1px solid var(--c-border-strong);
+  background: var(--c-bg-media);
+  opacity: 0.7;
+  aspect-ratio: 1;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.product-detail-thumb.is-active {
+  opacity: 1;
+  border-color: var(--c-text);
+}
+
+.product-detail-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ---------- Info ---------- */
+.product-detail-info {
+  padding: 22px 0 0;
+}
+
+.product-detail-kicker {
+  font-size: 9px;
+  letter-spacing: 0.27em;
+  color: var(--c-muted);
+  margin: 0 0 20px;
+}
+
+.product-detail-info h1 {
+  font-size: clamp(29px, 4vw, 48px);
+  font-weight: 400;
+  letter-spacing: 0.13em;
+  line-height: 1.15;
+  margin: 0 0 18px;
+}
+
+.product-detail-price {
+  font-size: 19px;
+  letter-spacing: 0.12em;
+  margin: 0 0 28px;
+}
+
+.product-detail-description {
+  font-size: 14px;
+  line-height: 1.9;
+  color: var(--c-text-body);
+  max-width: 480px;
+  margin: 0 0 30px;
+}
+
+.product-detail-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 14px 0;
+  border-top: 1px solid var(--c-border);
+  font-size: 10px;
+  letter-spacing: 0.17em;
+}
+
+.product-detail-meta span {
+  color: var(--c-subtle);
+}
+
+.product-detail-meta strong {
+  font-weight: 400;
+  color: var(--c-text);
+}
+
+/* ---------- Sizes ---------- */
+.product-size-heading {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  margin: 30px 0 13px;
+}
+
+.product-size-options {
+  display: flex;
+  gap: 9px;
+}
+
+.product-size {
+  width: 48px;
+  height: 45px;
+  background: transparent;
+  border: 1px solid var(--c-border-input);
+  color: var(--c-text);
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.product-size.is-selected {
+  background: var(--c-inverse);
+  color: var(--c-on-inverse);
+  border-color: var(--c-inverse);
+}
+
+.product-size.is-sold-out {
+  opacity: 0.38;
+  text-decoration: line-through;
+  border-style: dashed;
+  cursor: not-allowed;
+}
+
+.product-size-note {
+  font-size: 10px;
+  color: var(--c-muted);
+  letter-spacing: 0.1em;
+  margin: 12px 0 22px;
+}
+
+.product-stock-status {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--c-text-dim);
+  margin: 10px 0 6px;
+  min-height: 14px;
+}
+
+/* ---------- Size guide ---------- */
+.duskeo-size-guide {
+  max-width: 440px;
+  margin: 4px 0 22px;
+  border-top: 1px solid var(--c-border-strong);
+  border-bottom: 1px solid var(--c-border-strong);
+}
+
+.duskeo-size-guide summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 16px 0;
+  color: var(--c-text);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.duskeo-size-guide summary::-webkit-details-marker {
+  display: none;
+}
+
+.duskeo-size-guide summary::after {
+  content: '+';
+  font-size: 16px;
+  line-height: 10px;
+}
+
+.duskeo-size-guide[open] summary::after {
+  content: '−';
+}
+
+.duskeo-size-guide summary span {
+  color: var(--c-subtle);
+  font-size: 9px;
+}
+
+.duskeo-size-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.duskeo-size-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 340px;
+  font-size: 10px;
+  text-align: center;
+}
+
+.duskeo-size-table th {
+  background: var(--c-inverse);
+  color: var(--c-on-inverse);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  padding: 11px 5px;
+}
+
+.duskeo-size-table td {
+  border: 1px solid var(--c-border-strong);
+  color: var(--c-text-soft);
+  padding: 11px 5px;
+}
+
+.duskeo-size-tolerance {
+  font-size: 9px;
+  color: var(--c-subtle);
+  line-height: 1.7;
+  margin: 12px 0 16px;
+}
+
+/* ---------- Add to bag + restock ---------- */
+.product-detail-add {
+  width: 100%;
+  max-width: 380px;
+  padding: 16px 20px;
+  margin: 0;
+  text-align: center;
+}
+
+.product-detail-add:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+}
+
+.notify-stock {
+  display: none;
+  margin: 12px 0;
+  padding: 14px;
+  border: 1px solid var(--c-border-strong);
+}
+
+.notify-stock.show {
+  display: block;
+}
+
+.notify-stock p {
+  font-size: 11px;
+  color: var(--c-muted);
+  line-height: 1.6;
+  margin: 0 0 10px;
+}
+
+.notify-stock input {
+  width: 100%;
+  padding: 12px;
+  background: var(--c-bg-media);
+  border: 1px solid var(--c-border-input);
+  color: var(--c-text);
+  margin: 0 0 9px;
+}
+
+.notify-stock button {
+  border: 1px solid var(--c-border-muted);
+  background: transparent;
+  padding: 10px 13px;
+  font-size: 9px;
+  letter-spacing: 0.13em;
+}
+
+/* ---------- Care + related ---------- */
+.duskeo-care-block,
+.duskeo-related {
+  max-width: 440px;
+  border-top: 1px solid var(--c-border);
+  padding: 18px 0 4px;
+  margin-top: 18px;
+}
+
+.duskeo-care-block h3,
+.duskeo-related h3 {
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  font-weight: 500;
+  margin: 0 0 10px;
+  color: var(--c-text);
+}
+
+.duskeo-care-block p {
+  font-size: 11px;
+  line-height: 1.8;
+  color: var(--c-muted);
+  margin: 0 0 10px;
+}
+
+.duskeo-care-block .duskeo-confirm-note {
+  font-size: 9px;
+  color: var(--c-faint);
+}
+
+.duskeo-related a {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--c-text);
+  text-decoration: none;
+}
+
+.product-detail-footnote {
+  font-size: 10px;
+  line-height: 1.8;
+  color: var(--c-faint);
+  max-width: 380px;
+  margin-top: 18px;
+}
+
+@media (max-width: 760px) {
+  .product-detail-grid {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+
+  .product-detail-info {
+    padding-top: 0;
+  }
+
+  .product-detail-info h1 {
+    font-size: 32px;
+  }
+
+  .product-detail-thumbs {
+    gap: 6px;
+    margin-top: 7px;
+  }
+}

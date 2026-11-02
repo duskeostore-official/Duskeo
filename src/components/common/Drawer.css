@@ -1,0 +1,40 @@
+.shade {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(var(--c-shade-rgb), 0.73);
+  z-index: 20;
+  justify-content: flex-end;
+}
+
+.shade.open {
+  display: flex;
+}
+
+.drawer {
+  background: var(--c-bg-surface);
+  color: var(--c-text-strong);
+  width: min(400px, 100%);
+  height: 100%;
+  padding: 25px;
+  border-left: 1px solid var(--c-border-strong);
+  overflow: auto;
+}
+
+.drawer-head {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--c-border-strong);
+  padding-bottom: 16px;
+  letter-spacing: 0.15em;
+}
+
+.drawer-close {
+  border: 0;
+  background: none;
+  font-size: 22px;
+}
+
+.drawer .outline {
+  width: 100%;
+}

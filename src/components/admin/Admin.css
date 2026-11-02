@@ -1,0 +1,184 @@
+/* ---------- Login ---------- */
+.inventory-login {
+  display: none;
+  position: fixed;
+  z-index: 80;
+  inset: 0;
+  background: rgba(var(--c-shade-rgb), 0.93);
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+}
+
+.inventory-login.open {
+  display: flex;
+}
+
+.inventory-login-panel {
+  width: min(430px, 100%);
+  background: var(--c-bg-surface);
+  color: var(--c-text-strong);
+  border: 1px solid var(--c-border-input);
+  padding: 26px;
+}
+
+.inventory-login-kicker {
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  color: var(--c-muted);
+  margin: 0 0 18px;
+}
+
+.inventory-login-panel h2 {
+  font-size: 19px;
+  letter-spacing: 0.18em;
+  font-weight: 500;
+  margin: 0 0 12px;
+}
+
+.inventory-login-panel p {
+  font-size: 11px;
+  line-height: 1.7;
+  color: var(--c-muted);
+}
+
+.inventory-login-panel input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 13px;
+  margin: 8px 0;
+  background: var(--c-bg-input);
+  border: 1px solid var(--c-border-input);
+  color: var(--c-text-strong);
+}
+
+.inventory-login-panel button {
+  padding: 12px 15px;
+  margin: 8px 8px 0 0;
+  border: 1px solid var(--c-border-muted);
+  background: transparent;
+  color: var(--c-text);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+}
+
+.inventory-login-panel .inventory-login-status {
+  min-height: 16px;
+  color: var(--c-text-soft);
+}
+
+.inventory-login-panel .inventory-login-note {
+  border-top: 1px solid var(--c-border-strong);
+  padding-top: 12px;
+  margin-top: 18px;
+  font-size: 10px;
+}
+
+/* ---------- Inventory panel ---------- */
+.inventory-admin {
+  display: none;
+  position: fixed;
+  z-index: 60;
+  inset: 0;
+  background: rgba(var(--c-shade-rgb), 0.87);
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.inventory-admin.open {
+  display: flex;
+}
+
+.inventory-admin-panel {
+  width: min(760px, 100%);
+  max-height: 88vh;
+  overflow: auto;
+  background: var(--c-bg-surface);
+  color: var(--c-text-strong);
+  border: 1px solid var(--c-border-input);
+  padding: 22px;
+}
+
+.inventory-admin-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid var(--c-border-strong);
+  padding-bottom: 14px;
+}
+
+.inventory-admin h2 {
+  font-size: 16px;
+  letter-spacing: 0.2em;
+  font-weight: 500;
+}
+
+.inventory-admin .admin-warning {
+  font-size: 11px;
+  line-height: 1.7;
+  color: var(--c-text-dim);
+}
+
+.inventory-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  margin: 15px 0;
+}
+
+.inventory-table th,
+.inventory-table td {
+  padding: 9px 5px;
+  border-bottom: 1px solid var(--c-border);
+  text-align: left;
+}
+
+.inventory-table input {
+  width: 64px;
+  background: var(--c-bg-input);
+  color: var(--c-text);
+  border: 1px solid var(--c-border-input);
+  padding: 7px;
+}
+
+.inventory-admin button {
+  border: 1px solid var(--c-border-muted);
+  background: transparent;
+  padding: 10px 13px;
+  font-size: 9px;
+  letter-spacing: 0.13em;
+}
+
+.inventory-admin .admin-actions {
+  display: flex;
+  gap: 9px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.inventory-admin .admin-status {
+  font-size: 11px;
+  color: var(--c-text-dim);
+  min-height: 18px;
+}
+
+@media (max-width: 520px) {
+  .inventory-admin-panel {
+    padding: 14px;
+  }
+
+  .inventory-table {
+    font-size: 9px;
+  }
+
+  .inventory-table th,
+  .inventory-table td {
+    padding: 7px 3px;
+  }
+
+  .inventory-table input {
+    width: 48px;
+  }
+}

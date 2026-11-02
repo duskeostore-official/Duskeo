@@ -1,0 +1,131 @@
+/* Base styles + small shared building blocks.
+   All colors come from CSS variables set by ThemeProvider (src/constants/theme.ts). */
+
+/* Layout sizes shared across components */
+:root {
+  /* Apple-style ease-out: quick start, long soft landing. */
+  --ease-apple: cubic-bezier(0.16, 1, 0.3, 1);
+  --header-h: 104px;
+  /* Visible screen height below the header. svh = stable on mobile
+     (ignores the browser toolbar showing/hiding); vh is the fallback. */
+  --screen-h: calc(100vh - var(--header-h));
+}
+
+@supports (height: 100svh) {
+  :root {
+    --screen-h: calc(100svh - var(--header-h));
+  }
+}
+
+@media (max-width: 700px) {
+  :root {
+    --header-h: 76px;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  /* Keeps layout from shifting when the popup locks page scrolling. */
+  scrollbar-gutter: stable;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--c-bg);
+  color: var(--c-text-strong);
+  font-family: var(--font-family, Arial, Helvetica, sans-serif);
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+/* Shared: small uppercase label above headings */
+.eyebrow {
+  font-size: 10px;
+  letter-spacing: 0.37em;
+  color: var(--c-text-dim);
+}
+
+/* Shared: outlined button / link */
+.outline {
+  border: 1px solid var(--c-border-muted);
+  background: rgba(var(--c-shade-rgb), 0.15);
+  padding: 15px 26px;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+}
+
+.outline:hover {
+  background: var(--c-text-strong);
+  color: var(--c-bg-elevated);
+}
+
+/* Shared: "ADD TO BAG +" button */
+.add {
+  margin-top: 12px;
+  border: 1px solid var(--c-border-strong);
+  background: transparent;
+  padding: 9px 13px;
+  font-size: 9px;
+  letter-spacing: 0.15em;
+}
+
+.small-note {
+  font-size: 11px;
+  color: var(--c-muted);
+  line-height: 1.6;
+  letter-spacing: 0.03em;
+}
+
+/* Shared: kicker + back link used by policy / FAQ pages */
+.page-kicker {
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  color: var(--c-muted);
+}
+
+.page-back {
+  display: inline-block;
+  color: var(--c-muted);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-decoration: none;
+  margin: 0 0 34px;
+}
+
+.page-intro {
+  color: var(--c-text-body);
+  line-height: 1.8;
+  margin: 0 0 34px;
+}
+
+@media (max-width: 700px) {
+  .outline {
+    padding: 14px 15px;
+    font-size: 9px;
+    letter-spacing: 0.13em;
+  }
+}

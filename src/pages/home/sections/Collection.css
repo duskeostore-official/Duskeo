@@ -1,0 +1,111 @@
+.collection {
+  /* Side padding; the rails cancel it to run edge to edge. */
+  --collection-pad: 5.5vw;
+  /* Card sizing (read by ProductCard.css) scales with the screen. */
+  --card-w: clamp(138px, 14vw, 215px);
+  --card-gap: clamp(14px, 1.8vw, 26px);
+
+  padding: 39px var(--collection-pad) 45px;
+  border-bottom: 1px solid var(--c-line);
+}
+
+.collection-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.collection h2 {
+  font-size: clamp(28px, 3.4vw, 42px);
+  letter-spacing: 0.28em;
+  font-weight: 500;
+  margin: 13px 0 9px;
+}
+
+.collection .sub {
+  font-size: 10px;
+  letter-spacing: 0.4em;
+  color: var(--c-text-dim);
+}
+
+.collection .view {
+  border: 0;
+  border-bottom: 1px solid var(--c-muted);
+  background: transparent;
+  padding: 8px 0;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+}
+
+/* ---------- Rails ---------- */
+.products {
+  margin-inline: calc(-1 * var(--collection-pad));
+  display: flex;
+  flex-direction: column;
+}
+
+.rail {
+  position: relative;
+  overflow: hidden;
+  /* Vertical room so hovered (scaled-up) cards are not clipped. */
+  padding-block: 30px;
+  cursor: grab;
+  user-select: none;
+  /* Let the page scroll vertically on touch; horizontal swipes drive the rail. */
+  touch-action: pan-y;
+  /* Soft fade at both edges. */
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+}
+
+.rail:active {
+  cursor: grabbing;
+}
+
+.rail + .rail {
+  margin-top: -18px;
+}
+
+.rail-track {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+}
+
+.rail-set {
+  display: flex;
+  flex: 0 0 auto;
+}
+
+/* Phones: one card at a time, centered; rails step instead of drifting
+   (see useInfiniteRail — mode follows RAIL_STEP_QUERY). */
+@media (max-width: 700px) {
+  .collection {
+    --collection-pad: 16px;
+    --card-w: 62vw;
+    --card-gap: 16px;
+
+    padding-block: 32px 30px;
+  }
+
+  .collection h2 {
+    font-size: 27px;
+  }
+
+  .collection .sub {
+    font-size: 8px;
+    letter-spacing: 0.24em;
+  }
+
+  .rail {
+    padding-block: 16px;
+    /* Neighbours fade out so a single card reads as "the" item. */
+    -webkit-mask-image: linear-gradient(90deg, transparent 10%, #000 19%, #000 81%, transparent 90%);
+    mask-image: linear-gradient(90deg, transparent 10%, #000 19%, #000 81%, transparent 90%);
+  }
+
+  .rail + .rail {
+    margin-top: 6px;
+  }
+}

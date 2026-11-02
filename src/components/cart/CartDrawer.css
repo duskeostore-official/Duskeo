@@ -1,0 +1,31 @@
+.drawer-item {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 17px 0;
+  border-bottom: 1px solid var(--c-line);
+  font-size: 13px;
+}
+
+.drawer-item button {
+  background: transparent;
+  border: 1px solid var(--c-border-input);
+  padding: 3px 8px;
+}
+
+.drawer-item .cart-remove {
+  border: 0;
+  background: none;
+  color: var(--c-muted);
+  text-decoration: underline;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  margin-left: 8px;
+  padding: 0;
+}
+
+.drawer-total {
+  display: flex;
+  justify-content: space-between;
+  margin: 24px 0;
+}

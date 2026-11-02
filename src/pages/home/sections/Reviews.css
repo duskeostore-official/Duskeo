@@ -1,0 +1,129 @@
+.reviews {
+  padding: 64px 5.5% 68px;
+  border-top: 1px solid var(--c-border-header);
+  border-bottom: 1px solid var(--c-border-header);
+  background: linear-gradient(180deg, var(--c-bg-section) 0%, var(--c-bg) 100%);
+}
+
+.reviews-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 30px;
+  margin: 0 0 30px;
+}
+
+.reviews-head h2 {
+  font-size: clamp(22px, 3vw, 34px);
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  line-height: 1.2;
+  margin: 14px 0;
+}
+
+.reviews-head p {
+  max-width: 600px;
+  color: var(--c-muted);
+  font-size: 12px;
+  line-height: 1.8;
+  letter-spacing: 0.04em;
+  margin: 0;
+}
+
+.reviews-link {
+  flex-shrink: 0;
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  border-bottom: 1px solid var(--c-border-muted);
+  padding: 10px 0;
+}
+
+.review-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.review-card {
+  min-height: 190px;
+  padding: 25px 23px;
+  border: 1px solid var(--c-border);
+  background: linear-gradient(135deg, rgba(var(--c-sheen-rgb), 0.035), rgba(var(--c-sheen-rgb), 0.008));
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.review-mark {
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  color: var(--c-muted);
+}
+
+.review-card h3 {
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  margin: 22px 0 10px;
+}
+
+.review-card p {
+  font-size: 11px;
+  line-height: 1.8;
+  letter-spacing: 0.04em;
+  color: var(--c-muted);
+  margin: 0 0 22px;
+}
+
+.review-status {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--c-border);
+  width: 100%;
+  font-size: 8px;
+  letter-spacing: 0.16em;
+  color: var(--c-text-soft);
+}
+
+@media (max-width: 700px) {
+  .reviews {
+    padding: 42px 18px 46px;
+  }
+
+  .reviews-head {
+    display: block;
+    margin-bottom: 22px;
+  }
+
+  .reviews-head h2 {
+    font-size: 22px;
+    letter-spacing: 0.12em;
+  }
+
+  .reviews-head p {
+    font-size: 11px;
+  }
+
+  .reviews-link {
+    display: inline-block;
+    margin-top: 18px;
+  }
+
+  .review-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .review-card {
+    min-height: 150px;
+    padding: 20px;
+  }
+
+  .review-card h3 {
+    margin: 14px 0 8px;
+  }
+
+  .review-card p {
+    margin-bottom: 14px;
+  }
+}

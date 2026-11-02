@@ -1,0 +1,29 @@
+.product-detail-page {
+  background: var(--c-bg-elevated);
+  color: var(--c-text);
+  min-height: 75vh;
+}
+
+.product-detail-wrap {
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 28px 5.5% 90px;
+}
+
+.product-back-link {
+  display: inline-block;
+  color: var(--c-muted);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  margin: 8px 0 30px;
+}
+
+@media (max-width: 760px) {
+  .product-detail-wrap {
+    padding: 18px 4.5% 65px;
+  }
+
+  .product-back-link {
+    margin-bottom: 18px;
+  }
+}

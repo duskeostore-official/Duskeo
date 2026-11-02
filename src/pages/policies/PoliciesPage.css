@@ -1,0 +1,120 @@
+.policy-page {
+  min-height: 75vh;
+  background: var(--c-bg-section);
+  color: var(--c-text);
+}
+
+.policy-shell {
+  max-width: 1050px;
+  margin: 0 auto;
+  padding: 34px 6% 90px;
+}
+
+.policy-shell h1 {
+  font-size: clamp(42px, 8vw, 78px);
+  font-weight: 400;
+  letter-spacing: 0.13em;
+  margin: 12px 0;
+}
+
+.policy-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin: 0 0 44px;
+  padding: 20px 0;
+  border-top: 1px solid var(--c-border);
+  border-bottom: 1px solid var(--c-border);
+}
+
+.policy-nav a {
+  border: 1px solid var(--c-border-strong);
+  padding: 10px 13px;
+  color: var(--c-text-soft);
+  text-decoration: none;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+}
+
+.policy-nav a.active,
+.policy-nav a:hover {
+  background: var(--c-inverse);
+  color: var(--c-on-inverse);
+}
+
+.policy-section {
+  max-width: 790px;
+  padding: 4px 0 22px;
+}
+
+.policy-section h2 {
+  font-size: clamp(27px, 4vw, 40px);
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  margin: 10px 0 24px;
+}
+
+.policy-section h3 {
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  font-weight: 500;
+  color: var(--c-text);
+  margin: 28px 0 9px;
+  text-transform: uppercase;
+}
+
+.policy-section p {
+  font-size: 14px;
+  line-height: 1.95;
+  color: var(--c-text-body);
+  margin: 0 0 14px;
+}
+
+.policy-section a {
+  color: var(--c-text);
+}
+
+.policy-contact {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 12px;
+  padding: 20px;
+  border: 1px solid var(--c-border);
+  margin: 24px 0;
+  color: var(--c-text-soft);
+  font-size: 13px;
+}
+
+.policy-contact strong {
+  font-weight: 500;
+  color: var(--c-text);
+}
+
+.policy-note {
+  border-top: 1px solid var(--c-border);
+  margin-top: 40px;
+  padding-top: 20px;
+  color: var(--c-faint);
+  font-size: 11px;
+  line-height: 1.8;
+}
+
+@media (max-width: 650px) {
+  .policy-shell {
+    padding: 24px 5% 65px;
+  }
+
+  .policy-nav {
+    gap: 7px;
+  }
+
+  .policy-nav a {
+    font-size: 9px;
+    padding: 9px;
+  }
+
+  .policy-contact {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+}
