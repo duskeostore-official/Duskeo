@@ -65,7 +65,7 @@ export function StoryPage() {
           </h2>
           <p>Distinctive identity. Considered design. A mindset that keeps moving.</p>
           <div className="story-page-signoff">{BRAND_TAGLINE}</div>
-          <a className="story-page-shop" href={ROUTES.collection}>
+          <a className="story-page-shop" href={ROUTES.explore}>
             EXPLORE THE COLLECTION <span>→</span>
           </a>
         </div>

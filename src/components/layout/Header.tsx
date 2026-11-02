@@ -28,7 +28,6 @@ export function Header({ onOpenProfile }: HeaderProps) {
         </button>
         <nav className="nav">
           <a href={ROUTES.collection}>SHOP</a>
-          <a href={ROUTES.collection}>COLLECTIONS</a>
           <a className="mobile-story-link" href={ROUTES.ourStory}>
             OUR STORY
           </a>
@@ -49,7 +48,7 @@ export function Header({ onOpenProfile }: HeaderProps) {
         {SHOW_THEME_TOGGLE && <ThemeToggle />}
         <a
           className="header-icon search-icon"
-          href={ROUTES.collection}
+          href={ROUTES.search}
           aria-label="Search products"
           title="Search products"
         >

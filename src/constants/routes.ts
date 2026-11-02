@@ -6,6 +6,10 @@ export const ROUTES = {
   footer: '#footer',
   ourStory: '#our-story',
   faq: '#faq',
+  /** Plain search (header icon, VIEW ALL). */
+  search: '#search',
+  /** Themed, editorial version of the search page (EXPLORE THE COLLECTION). */
+  explore: '#explore',
   admin: '#admin',
   policyPrefix: '#policy-',
 } as const

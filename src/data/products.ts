@@ -30,6 +30,8 @@ const REAL_PRODUCTS: Product[] = [
     slug: 'levi-aura',
     name: 'LEVI AURA TEE',
     price: 699,
+    theme: 'Anime',
+    launchedAt: '2026-10-20',
     cardAlt: 'LEVI AURA TEE — black oversized T-shirt front view',
     kicker: KICKER,
     description:
@@ -46,6 +48,8 @@ const REAL_PRODUCTS: Product[] = [
     slug: 'crimson-ronin',
     name: 'CRIMSON RONIN TEE',
     price: 699,
+    theme: 'Samurai',
+    launchedAt: '2026-10-24',
     cardAlt: 'CRIMSON RONIN TEE front view',
     kicker: KICKER,
     description:
@@ -63,6 +67,8 @@ const REAL_PRODUCTS: Product[] = [
     slug: 'solar-awakening',
     name: 'CLOUD REIGN TEE',
     price: 699,
+    theme: 'Mythic',
+    launchedAt: '2026-10-28',
     cardAlt: 'CLOUD REIGN TEE front view',
     kicker: KICKER,
     description:

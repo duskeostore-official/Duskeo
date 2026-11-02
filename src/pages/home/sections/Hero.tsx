@@ -1,8 +1,7 @@
 import heroImage from '../../../assets/images/home/hero-campaign.webp'
+import { ROUTES } from '../../../constants/routes'
 import { BRAND_TAGLINE } from '../../../constants/site'
 import './Hero.css'
-
-const scrollToCollection = () => document.querySelector('#collection')?.scrollIntoView()
 
 export function Hero() {
   return (
@@ -16,9 +15,9 @@ export function Hero() {
         </h1>
         <div className="rule" />
         <p className="tagline">{BRAND_TAGLINE}</p>
-        <button className="outline" onClick={scrollToCollection}>
+        <a className="outline" href={ROUTES.explore}>
           EXPLORE THE COLLECTION {' '}→
-        </button>
+        </a>
         <div className="hero-note">
           PREMIUM ESSENTIALS {'  '}| {'  '}LIMITED DROPS {'  '}| {'  '}BUILT DIFFERENT
         </div>

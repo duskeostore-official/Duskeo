@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ROUTES } from '../constants/routes'
 import { findProduct } from '../data/products'
 import { POLICIES } from '../data/policies'
-import type { Route } from '../types'
+import type { Route, SearchMode } from '../types'
 
 const currentHash = () => window.location.hash
 
@@ -11,6 +11,13 @@ export function parseRoute(hash: string): Route {
   const lower = hash.toLowerCase()
   if (lower === ROUTES.ourStory) return { view: 'story' }
   if (lower === ROUTES.faq) return { view: 'faq' }
+  for (const mode of ['search', 'explore'] as const) {
+    const base = ROUTES[mode]
+    if (lower === base || lower.startsWith(base + '?')) {
+      const params = new URLSearchParams(hash.slice(base.length + 1))
+      return { view: 'search', query: params.get('q') ?? '', mode }
+    }
+  }
   if (lower.startsWith('#product-')) {
     const slug = lower.slice('#product-'.length)
     if (findProduct(slug)) return { view: 'product', slug }
@@ -23,6 +30,10 @@ export function parseRoute(hash: string): Route {
   const isPlain = !anchor || [ROUTES.home, ROUTES.top, ROUTES.admin].includes(lower as never)
   return { view: 'home', anchor: isPlain ? undefined : anchor }
 }
+
+/** Hash for the search page (plain or explore mode), optionally with a query. */
+export const searchHref = (query = '', mode: SearchMode = 'search') =>
+  query.trim() ? `${ROUTES[mode]}?${new URLSearchParams({ q: query.trim() })}` : ROUTES[mode]
 
 export function useHashRoute() {
   const [hash, setHash] = useState(currentHash)

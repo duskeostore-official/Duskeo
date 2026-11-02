@@ -15,6 +15,7 @@ import { FaqPage } from './pages/faq/FaqPage'
 import { HomePage } from './pages/home/HomePage'
 import { PoliciesPage } from './pages/policies/PoliciesPage'
 import { ProductPage } from './pages/product/ProductPage'
+import { SearchPage } from './pages/search/SearchPage'
 import { StoryPage } from './pages/story/StoryPage'
 import type { Route } from './types'
 
@@ -24,6 +25,9 @@ function pageTitle(route: Route) {
       return titleFor('Our Story')
     case 'faq':
       return titleFor('FAQ')
+    case 'search':
+      if (route.mode === 'explore') return titleFor('Explore the Collection')
+      return titleFor(route.query ? `Search: ${route.query}` : 'Search')
     case 'product':
       return titleFor(findProduct(route.slug)!.name)
     case 'policy':
@@ -39,6 +43,9 @@ function CurrentPage({ route }: { route: Route }) {
       return <StoryPage />
     case 'faq':
       return <FaqPage />
+    case 'search':
+      // Re-mount on real navigation to a new query (typing only replaces the URL).
+      return <SearchPage key={`${route.mode}-${route.query}`} initialQuery={route.query} mode={route.mode} />
     case 'product':
       return <ProductPage key={route.slug} product={findProduct(route.slug)!} />
     case 'policy':

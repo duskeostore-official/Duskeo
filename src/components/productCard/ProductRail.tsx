@@ -1,6 +1,7 @@
-import { ProductCard } from '../../../components/productCard/ProductCard'
-import { useInfiniteRail } from '../../../hooks/useInfiniteRail'
-import type { Product } from '../../../types'
+import { useInfiniteRail } from '../../hooks/useInfiniteRail'
+import type { Product } from '../../types'
+import { ProductCard } from './ProductCard'
+import './ProductRail.css'
 
 interface ProductRailProps {
   products: Product[]
@@ -12,7 +13,7 @@ interface ProductRailProps {
   onOpen: (slug: string) => void
 }
 
-/** One endless, draggable row of product cards. */
+/** One endless, draggable row of product cards (home collection, search). */
 export function ProductRail({ products, speed, direction, phase, label, onOpen }: ProductRailProps) {
   const { viewportRef, trackRef, copies, viewportProps } = useInfiniteRail({ speed, direction, phase })
 

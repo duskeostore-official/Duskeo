@@ -1,14 +1,13 @@
+import { ROUTES } from '../../../constants/routes'
 import { RAIL_SPEEDS, RAIL_STEP_INTERVAL_MS } from '../../../constants/site'
 import { useProductModal } from '../../../context/productModal/useProductModal'
 import { PRODUCTS } from '../../../data/products'
-import { ProductRail } from './ProductRail'
+import { ProductRail } from '../../../components/productCard/ProductRail'
 import './Collection.css'
 
 // Alternate products between the two rails so both rows mix real + dummy tees.
 const ROW_ONE = PRODUCTS.filter((_, i) => i % 2 === 0)
 const ROW_TWO = PRODUCTS.filter((_, i) => i % 2 === 1)
-
-const scrollToProducts = () => document.querySelector('.products')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
 
 export function Collection() {
   const modal = useProductModal()
@@ -21,9 +20,9 @@ export function Collection() {
           <h2>ESSENTIALS</h2>
           <div className="sub">FOR A DIFFERENT TOMORROW</div>
         </div>
-        <button className="view" onClick={scrollToProducts}>
+        <a className="view" href={ROUTES.search}>
           VIEW ALL {' '}→
-        </button>
+        </a>
       </div>
       <div className="products">
         <ProductRail
