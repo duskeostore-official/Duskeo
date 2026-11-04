@@ -12,20 +12,13 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
   const stockRef = useRef(stock)
 
   const load = useCallback(async () => {
-    const { data, error } = await supabase
-      .from('inventory')
-      .select('size, quantity, products(name)')
+    // Shoppers get at most 10 per size; staff get the real on-hand count.
+    const { data, error } = await supabase.rpc('get_stock_levels')
     if (error || !data) return
     const raw: Partial<Stock> = {}
-    data.forEach((row) => {
-      const productRows = row.products as unknown
-      const productName = Array.isArray(productRows)
-        ? (productRows[0] as { name?: string } | undefined)?.name
-        : (productRows as { name?: string } | null)?.name
-      if (productName && row.size) {
-        raw[productName] ??= {} as Record<Size, number>
-        raw[productName][row.size as Size] = Number(row.quantity) || 0
-      }
+    ;(data as { product_title: string; size_label: string; quantity: number }[]).forEach((row) => {
+      raw[row.product_title] ??= {} as Record<Size, number>
+      raw[row.product_title][row.size_label as Size] = Number(row.quantity) || 0
     })
     const next = sanitizeStock(raw, productNames)
     stockRef.current = next
@@ -34,9 +27,11 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const initialLoad = window.setTimeout(() => void load(), 0)
+    // inventory events reach staff only (RLS); shoppers refresh when products.in_stock / sizes change.
     const channel = supabase
       .channel('catalog-inventory')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'inventory' }, () => void load())
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, () => void load())
       .subscribe()
     return () => {
       window.clearTimeout(initialLoad)
@@ -65,26 +60,21 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const replace = useCallback(async (next: Stock) => {
-    const { data: products, error: productError } = await supabase
-      .from('products')
-      .select('id, name')
-      .in('name', Object.keys(next))
-    if (productError) return { ok: false, error: productError.message }
-    const ids = new Map((products ?? []).map((product) => [product.name, product.id]))
+    const slugs = new Map(catalog.products.map((product) => [product.name, product.slug]))
     const rows = Object.entries(next).flatMap(([name, quantities]) =>
-      ids.has(name)
+      slugs.has(name)
         ? Object.entries(quantities).map(([size, quantity]) => ({
-            product_id: ids.get(name),
+            slug: slugs.get(name),
             size,
-            quantity: Math.max(0, Math.floor(Number(quantity) || 0)),
+            on_hand: Math.max(0, Math.floor(Number(quantity) || 0)),
           }))
         : [],
     )
-    const { error } = await supabase.from('inventory').upsert(rows, { onConflict: 'product_id,size' })
+    const { error } = await supabase.rpc('admin_set_stock', { p_rows: rows })
     if (error) return { ok: false, error: error.message }
     await load()
     return { ok: true }
-  }, [load])
+  }, [catalog.products, load])
 
   const reset = useCallback(async () => replace(zeroStock(productNames)), [productNames, replace])
 

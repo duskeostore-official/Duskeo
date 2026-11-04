@@ -74,8 +74,8 @@ export function InventoryAdmin({ onClose }: { onClose: () => void }) {
     const cleanName = name.trim().replace(/\s+/g, ' ')
     const numericPrice = Math.floor(Number(price))
     if (!cleanName) return setStatus('Enter a product name.')
-    if (!Number.isFinite(numericPrice) || numericPrice < 0 || numericPrice > 1_000_000) {
-      return setStatus('Enter a valid price from 0 to 1000000.')
+    if (!Number.isFinite(numericPrice) || numericPrice < 1 || numericPrice > 1_000_000) {
+      return setStatus('Enter a valid price from 1 to 1000000.')
     }
     if (!description.trim()) return setStatus('Enter a product description.')
     if (!photos.length) return setStatus('Upload at least one product photo.')
@@ -166,7 +166,7 @@ export function InventoryAdmin({ onClose }: { onClose: () => void }) {
             </label>
             <label>
               PRICE (₹)
-              <input type="number" min={0} max={1000000} step={1} value={price} onChange={(e) => setPrice(e.target.value)} />
+              <input type="number" min={1} max={1000000} step={1} value={price} onChange={(e) => setPrice(e.target.value)} />
             </label>
             <label>
               THEME
