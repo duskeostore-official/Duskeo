@@ -33,12 +33,13 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
   }, [productNames])
 
   useEffect(() => {
-    void load()
+    const initialLoad = window.setTimeout(() => void load(), 0)
     const channel = supabase
       .channel('catalog-inventory')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'inventory' }, () => void load())
       .subscribe()
     return () => {
+      window.clearTimeout(initialLoad)
       void supabase.removeChannel(channel)
     }
   }, [load])

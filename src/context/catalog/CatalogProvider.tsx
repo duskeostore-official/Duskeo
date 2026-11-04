@@ -42,12 +42,13 @@ export function CatalogProvider({ children }: { children: ReactNode }) {
   }, [])
 
   useEffect(() => {
-    void load()
+    const initialLoad = window.setTimeout(() => void load(), 0)
     const channel = supabase
       .channel('catalog-products')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, () => void load())
       .subscribe()
     return () => {
+      window.clearTimeout(initialLoad)
       void supabase.removeChannel(channel)
     }
   }, [load])
