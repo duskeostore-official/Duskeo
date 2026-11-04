@@ -1,16 +1,15 @@
 import { ROUTES } from '../../../constants/routes'
 import { RAIL_SPEEDS, RAIL_STEP_INTERVAL_MS } from '../../../constants/site'
 import { useProductModal } from '../../../context/productModal/useProductModal'
-import { PRODUCTS } from '../../../data/products'
+import { useCatalog } from '../../../context/catalog/useCatalog'
 import { ProductRail } from '../../../components/productCard/ProductRail'
 import './Collection.css'
 
-// Alternate products between the two rails so both rows mix real + dummy tees.
-const ROW_ONE = PRODUCTS.filter((_, i) => i % 2 === 0)
-const ROW_TWO = PRODUCTS.filter((_, i) => i % 2 === 1)
-
 export function Collection() {
   const modal = useProductModal()
+  const { products } = useCatalog()
+  const rowOne = products.filter((_, i) => i % 2 === 0)
+  const rowTwo = products.filter((_, i) => i % 2 === 1)
 
   return (
     <section className="collection" id="collection">
@@ -26,15 +25,15 @@ export function Collection() {
       </div>
       <div className="products">
         <ProductRail
-          products={ROW_ONE}
+          products={rowOne}
           speed={RAIL_SPEEDS[0]}
           direction={1}
           label="Collection, row 1"
           onOpen={modal.open}
         />
-        {ROW_TWO.length > 0 && (
+        {rowTwo.length > 0 && (
           <ProductRail
-            products={ROW_TWO}
+            products={rowTwo}
             speed={RAIL_SPEEDS[1]}
             direction={-1}
             phase={RAIL_STEP_INTERVAL_MS / 2}

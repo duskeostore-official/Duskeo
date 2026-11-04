@@ -164,9 +164,120 @@
   min-height: 18px;
 }
 
+.product-admin-form {
+  margin: 18px 0;
+  border: 1px solid var(--c-border);
+  padding: 16px;
+}
+
+.product-admin-form h3 {
+  margin: 0 0 14px;
+  font-size: 11px;
+  letter-spacing: 0.18em;
+}
+
+.product-admin-fields {
+  display: grid;
+  grid-template-columns: 1fr 150px 150px;
+  gap: 10px;
+}
+
+.product-admin-fields label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+}
+
+.product-admin-fields input,
+.product-admin-fields select,
+.product-admin-fields textarea {
+  width: 100%;
+  border: 1px solid var(--c-border-input);
+  background: var(--c-bg-input);
+  color: var(--c-text-strong);
+  padding: 9px;
+}
+
+.product-admin-description {
+  grid-column: 1 / -1;
+}
+
+.product-photo-upload {
+  display: inline-block;
+  margin-top: 12px;
+  border: 1px dashed var(--c-border-muted);
+  padding: 11px;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  cursor: pointer;
+}
+
+.product-photo-upload input {
+  display: none;
+}
+
+.product-photo-previews {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.product-photo-preview {
+  position: relative;
+  aspect-ratio: 0.84 / 1;
+}
+
+.product-photo-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.product-photo-preview button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border: 1px solid var(--c-border-strong);
+  background: var(--c-bg);
+}
+
+.inventory-admin .product-upload-button {
+  margin-top: 12px;
+}
+
+.inventory-table td:first-child {
+  min-width: 190px;
+}
+
+.inventory-admin .product-delete-button {
+  margin-left: 0;
+  padding: 5px 7px;
+  color: #b84a3a;
+  border-color: rgba(184, 74, 58, 0.5);
+}
+
 @media (max-width: 520px) {
   .inventory-admin-panel {
     padding: 14px;
+  }
+
+  .product-admin-fields {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .product-admin-fields label:first-child,
+  .product-admin-description {
+    grid-column: 1 / -1;
+  }
+
+  .product-photo-previews {
+    grid-template-columns: repeat(2, 1fr);
   }
 
   .inventory-table {

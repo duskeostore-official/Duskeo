@@ -1,15 +1,24 @@
 import { useState } from 'react'
 import { SIZES } from '../../constants/site'
 import { useInventory } from '../../context/inventory/useInventory'
-import { PRODUCTS } from '../../data/products'
-import type { Size, Stock } from '../../types'
+import { useCatalog } from '../../context/catalog/useCatalog'
+import { useCart } from '../../context/cart/useCart'
+import type { Product, ProductTheme, Size, Stock } from '../../types'
 import { zeroStock } from '../../utils/inventory'
 
 export function InventoryAdmin({ onClose }: { onClose: () => void }) {
   const inventory = useInventory()
+  const catalog = useCatalog()
+  const cart = useCart()
   // Inputs edit a draft; nothing changes on the site until SAVE.
   const [draft, setDraft] = useState<Stock>(inventory.stock)
   const [status, setStatus] = useState('')
+  const [name, setName] = useState('')
+  const [price, setPrice] = useState('699')
+  const [theme, setTheme] = useState<ProductTheme>('Anime')
+  const [description, setDescription] = useState('')
+  const [photos, setPhotos] = useState<{ src: string; name: string }[]>([])
+  const [uploading, setUploading] = useState(false)
 
   const setQty = (product: string, size: Size, value: string) =>
     setDraft((d) => ({ ...d, [product]: { ...d[product], [size]: Math.max(0, Math.floor(Number(value) || 0)) } }))
@@ -21,8 +30,111 @@ export function InventoryAdmin({ onClose }: { onClose: () => void }) {
 
   const reset = () => {
     inventory.reset()
-    setDraft(zeroStock())
+    setDraft(zeroStock(catalog.products.map((product) => product.name)))
     setStatus('All stock quantities reset to zero.')
+  }
+
+  const readPhoto = (file: File) =>
+    new Promise<{ src: string; name: string }>((resolve, reject) => {
+      if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+        reject(new Error(`${file.name} is not a JPG, PNG, or WebP image.`))
+        return
+      }
+      if (file.size > 1_500_000) {
+        reject(new Error(`${file.name} is larger than 1.5 MB.`))
+        return
+      }
+      const reader = new FileReader()
+      reader.onload = () => resolve({ src: String(reader.result), name: file.name })
+      reader.onerror = () => reject(new Error(`Could not read ${file.name}.`))
+      reader.readAsDataURL(file)
+    })
+
+  const uploadPhotos = async (files: FileList | null) => {
+    if (!files?.length) return
+    const remaining = 4 - photos.length
+    if (remaining <= 0) {
+      setStatus('A product can have up to 4 photos.')
+      return
+    }
+    setUploading(true)
+    try {
+      const selected = Array.from(files).slice(0, remaining)
+      const loaded = await Promise.all(selected.map(readPhoto))
+      setPhotos((current) => [...current, ...loaded].slice(0, 4))
+      setStatus(`${loaded.length} photo${loaded.length === 1 ? '' : 's'} ready.`)
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : 'Photo upload failed.')
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  const addProduct = () => {
+    const cleanName = name.trim().replace(/\s+/g, ' ')
+    const numericPrice = Math.floor(Number(price))
+    if (!cleanName) return setStatus('Enter a product name.')
+    if (!Number.isFinite(numericPrice) || numericPrice < 0 || numericPrice > 1_000_000) {
+      return setStatus('Enter a valid price from 0 to 1000000.')
+    }
+    if (!description.trim()) return setStatus('Enter a product description.')
+    if (!photos.length) return setStatus('Upload at least one product photo.')
+
+    const slugBase = cleanName.toLowerCase().normalize('NFKD').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+    if (!slugBase) return setStatus('Product name must contain letters or numbers.')
+    const existingSlugs = new Set(catalog.products.map((product) => product.slug))
+    let slug = slugBase
+    let suffix = 2
+    while (existingSlugs.has(slug)) slug = `${slugBase}-${suffix++}`
+
+    const product: Product = {
+      slug,
+      name: cleanName.toUpperCase(),
+      price: numericPrice,
+      theme,
+      launchedAt: new Date().toISOString().slice(0, 10),
+      cardAlt: cleanName,
+      description: description.trim(),
+      kicker: 'DUSKEO / GRAPHIC COLLECTION',
+      photos: photos.map((photo, index) => ({
+        src: photo.src,
+        label: index === 0 ? 'Front view' : `View ${index + 1}`,
+        alt: `${cleanName}${index === 0 ? ' front view' : ` view ${index + 1}`}`,
+      })),
+      specs: [
+        { label: 'COLOR', value: 'BLACK' },
+        { label: 'FIT', value: 'OVERSIZED' },
+        { label: 'FABRIC', value: 'COTTON · 180 GSM' },
+      ],
+    }
+
+    const result = catalog.addProduct(product)
+    if (!result.ok) return setStatus(result.error ?? 'Could not add the product.')
+    setDraft((current) => ({
+      ...current,
+      [product.name]: Object.fromEntries(SIZES.map((size) => [size, 0])) as Record<Size, number>,
+    }))
+    setName('')
+    setPrice('699')
+    setTheme('Anime')
+    setDescription('')
+    setPhotos([])
+    setStatus(`Product "${product.name}" uploaded successfully.`)
+  }
+
+  const deleteProduct = (product: Product) => {
+    if (!window.confirm(`Delete "${product.name}"? This cannot be undone.`)) return
+    const nextStock = { ...inventory.stock }
+    delete nextStock[product.name]
+    inventory.replace(nextStock)
+    cart.remove(product.name)
+    catalog.deleteProduct(product.slug)
+    setDraft((current) => {
+      const next = { ...current }
+      delete next[product.name]
+      return next
+    })
+    setStatus(`Product "${product.name}" deleted.`)
   }
 
   return (
@@ -45,6 +157,56 @@ export function InventoryAdmin({ onClose }: { onClose: () => void }) {
           device. This demo panel has no login protection and is not a secure production admin system. Initial
           quantities are set to zero so the site does not claim stock you have not entered.
         </p>
+        <section className="product-admin-form" aria-labelledby="upload-product-heading">
+          <h3 id="upload-product-heading">ADD PRODUCT</h3>
+          <div className="product-admin-fields">
+            <label>
+              PRODUCT NAME
+              <input value={name} maxLength={80} onChange={(e) => setName(e.target.value)} placeholder="MIDNIGHT TEE" />
+            </label>
+            <label>
+              PRICE (₹)
+              <input type="number" min={0} max={1000000} step={1} value={price} onChange={(e) => setPrice(e.target.value)} />
+            </label>
+            <label>
+              THEME
+              <select value={theme} onChange={(e) => setTheme(e.target.value as ProductTheme)}>
+                <option value="Anime">Anime</option>
+                <option value="Samurai">Samurai</option>
+                <option value="Mythic">Mythic</option>
+              </select>
+            </label>
+            <label className="product-admin-description">
+              DESCRIPTION
+              <textarea value={description} maxLength={600} rows={3} onChange={(e) => setDescription(e.target.value)} />
+            </label>
+          </div>
+          <label className="product-photo-upload">
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              multiple
+              disabled={uploading || photos.length >= 4}
+              onChange={(e) => void uploadPhotos(e.target.files)}
+            />
+            {uploading ? 'READING PHOTOS…' : photos.length ? `ADD MORE (${photos.length}/4)` : 'UPLOAD PHOTOS (1–4)'}
+          </label>
+          {photos.length > 0 && (
+            <div className="product-photo-previews">
+              {photos.map((photo, index) => (
+                <div className="product-photo-preview" key={`${photo.name}-${index}`}>
+                  <img src={photo.src} alt={photo.name} />
+                  <button type="button" aria-label={`Remove ${photo.name}`} onClick={() => setPhotos((current) => current.filter((_, i) => i !== index))}>
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+          <button type="button" className="product-upload-button" onClick={addProduct} disabled={uploading}>
+            UPLOAD PRODUCT
+          </button>
+        </section>
         <table className="inventory-table">
           <thead>
             <tr>
@@ -52,12 +214,15 @@ export function InventoryAdmin({ onClose }: { onClose: () => void }) {
               {SIZES.map((s) => (
                 <th key={s}>{s}</th>
               ))}
+              <th>DELETE</th>
             </tr>
           </thead>
           <tbody>
-            {PRODUCTS.map(({ name }) => (
-              <tr key={name}>
-                <td>{name}</td>
+            {catalog.products.map((product) => (
+              <tr key={product.slug}>
+                <td>
+                  <span>{product.name}</span>
+                </td>
                 {SIZES.map((s) => (
                   <td key={s}>
                     <input
@@ -65,12 +230,22 @@ export function InventoryAdmin({ onClose }: { onClose: () => void }) {
                       min={0}
                       step={1}
                       inputMode="numeric"
-                      aria-label={`${name} ${s} stock`}
-                      value={draft[name][s]}
-                      onChange={(e) => setQty(name, s, e.target.value)}
+                      aria-label={`${product.name} ${s} stock`}
+                      value={draft[product.name]?.[s] ?? 0}
+                      onChange={(e) => setQty(product.name, s, e.target.value)}
                     />
                   </td>
                 ))}
+                <td>
+                  <button
+                    type="button"
+                    className="product-delete-button"
+                    aria-label={`Delete ${product.name}`}
+                    onClick={() => deleteProduct(product)}
+                  >
+                    DELETE
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>

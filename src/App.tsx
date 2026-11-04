@@ -8,7 +8,7 @@ import { ProfileDrawer } from './components/profile/ProfileDrawer'
 import { LogoFilters } from './components/theme/LogoFilters'
 import { ROUTES } from './constants/routes'
 import { DEFAULT_TITLE, titleFor } from './constants/site'
-import { findProduct } from './data/products'
+import { useCatalog } from './context/catalog/useCatalog'
 import { POLICIES } from './data/policies'
 import { useHashRoute } from './hooks/useHashRoute'
 import { FaqPage } from './pages/faq/FaqPage'
@@ -17,9 +17,9 @@ import { PoliciesPage } from './pages/policies/PoliciesPage'
 import { ProductPage } from './pages/product/ProductPage'
 import { SearchPage } from './pages/search/SearchPage'
 import { StoryPage } from './pages/story/StoryPage'
-import type { Route } from './types'
+import type { Product, Route } from './types'
 
-function pageTitle(route: Route) {
+function pageTitle(route: Route, findProduct: (slug: string) => { name: string } | undefined) {
   switch (route.view) {
     case 'story':
       return titleFor('Our Story')
@@ -37,7 +37,7 @@ function pageTitle(route: Route) {
   }
 }
 
-function CurrentPage({ route }: { route: Route }) {
+function CurrentPage({ route, findProduct }: { route: Route; findProduct: (slug: string) => Product | undefined }) {
   switch (route.view) {
     case 'story':
       return <StoryPage />
@@ -56,26 +56,27 @@ function CurrentPage({ route }: { route: Route }) {
 }
 
 export default function App() {
-  const { hash, route, clearHash } = useHashRoute()
+  const catalog = useCatalog()
+  const { hash, route, clearHash } = useHashRoute(catalog.products)
   const [profileOpen, setProfileOpen] = useState(false)
   const anchor = route.view === 'home' ? route.anchor : undefined
 
   // Title + scroll position whenever the route changes.
   useEffect(() => {
-    document.title = pageTitle(route)
+    document.title = pageTitle(route, catalog.findProduct)
     if (anchor) {
       // The home view may have just mounted, so scroll after it renders.
       requestAnimationFrame(() => document.getElementById(anchor)?.scrollIntoView({ behavior: 'smooth' }))
     } else {
       window.scrollTo({ top: 0, behavior: 'instant' })
     }
-  }, [route, anchor])
+  }, [route, anchor, catalog.findProduct])
 
   return (
     <>
       <LogoFilters />
       <Header onOpenProfile={() => setProfileOpen(true)} />
-      <CurrentPage route={route} />
+      <CurrentPage route={route} findProduct={catalog.findProduct} />
       <Footer />
       <ProductModal />
       <CartDrawer />

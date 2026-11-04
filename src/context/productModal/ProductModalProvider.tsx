@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { MODAL_CLOSE_MS } from '../../constants/site'
-import { findProduct } from '../../data/products'
 import type { Product } from '../../types'
+import { useCatalog } from '../catalog/useCatalog'
 import { ProductModalContext, type ModalTransition } from './productModalContext'
 
 /** History-state key holding how many popup items are open at that entry. */
@@ -15,6 +15,7 @@ const depthOf = (state: unknown) => (state as Record<string, number> | null)?.[D
  * through the stack exactly like the popup's own BACK button.
  */
 export function ProductModalProvider({ children }: { children: ReactNode }) {
+  const catalog = useCatalog()
   const [stack, setStack] = useState<string[]>([])
   const [transition, setTransition] = useState<ModalTransition>('open')
   const [closing, setClosing] = useState(false)
@@ -83,7 +84,7 @@ export function ProductModalProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo(
     () => ({
-      stack: stack.map(findProduct).filter((p): p is Product => !!p),
+      stack: stack.map(catalog.findProduct).filter((p): p is Product => !!p),
       transition,
       closing,
       open,
@@ -91,7 +92,7 @@ export function ProductModalProvider({ children }: { children: ReactNode }) {
       back,
       close,
     }),
-    [stack, transition, closing, open, push, back, close],
+    [stack, transition, closing, open, push, back, close, catalog.findProduct],
   )
 
   return <ProductModalContext.Provider value={value}>{children}</ProductModalContext.Provider>

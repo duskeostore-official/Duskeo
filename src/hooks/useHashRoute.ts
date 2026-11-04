@@ -2,12 +2,12 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ROUTES } from '../constants/routes'
 import { findProduct } from '../data/products'
 import { POLICIES } from '../data/policies'
-import type { Route, SearchMode } from '../types'
+import type { Product, Route, SearchMode } from '../types'
 
 const currentHash = () => window.location.hash
 
 /** Maps a location hash to the view it should show (same rules as the original site). */
-export function parseRoute(hash: string): Route {
+export function parseRoute(hash: string, products: Product[] = []): Route {
   const lower = hash.toLowerCase()
   if (lower === ROUTES.ourStory) return { view: 'story' }
   if (lower === ROUTES.faq) return { view: 'faq' }
@@ -20,7 +20,7 @@ export function parseRoute(hash: string): Route {
   }
   if (lower.startsWith('#product-')) {
     const slug = lower.slice('#product-'.length)
-    if (findProduct(slug)) return { view: 'product', slug }
+    if (products.length ? products.some((product) => product.slug === slug) : findProduct(slug)) return { view: 'product', slug }
   }
   if (lower.startsWith(ROUTES.policyPrefix)) {
     const id = lower.slice(1)
@@ -35,7 +35,7 @@ export function parseRoute(hash: string): Route {
 export const searchHref = (query = '', mode: SearchMode = 'search') =>
   query.trim() ? `${ROUTES[mode]}?${new URLSearchParams({ q: query.trim() })}` : ROUTES[mode]
 
-export function useHashRoute() {
+export function useHashRoute(products: Product[] = []) {
   const [hash, setHash] = useState(currentHash)
 
   useEffect(() => {
@@ -60,7 +60,7 @@ export function useHashRoute() {
     setHash('')
   }, [])
 
-  const route = useMemo(() => parseRoute(hash), [hash])
+  const route = useMemo(() => parseRoute(hash, products), [hash, products])
 
   return { hash, route, navigate, clearHash }
 }

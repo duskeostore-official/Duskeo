@@ -1,6 +1,7 @@
 import { ProductCard } from '../../../components/productCard/ProductCard'
 import type { Product } from '../../../types'
 import { getSimilarProducts } from '../../../utils/recommendations'
+import { useCatalog } from '../../../context/catalog/useCatalog'
 import './Recommendations.css'
 
 interface RecommendationsProps {
@@ -9,7 +10,8 @@ interface RecommendationsProps {
 }
 
 export function Recommendations({ product, onOpen }: RecommendationsProps) {
-  const similar = getSimilarProducts(product)
+  const catalog = useCatalog()
+  const similar = getSimilarProducts(product, undefined, catalog.products)
   if (!similar.length) return null
 
   return (

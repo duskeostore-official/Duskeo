@@ -49,8 +49,8 @@
 @media (max-width: 700px) {
   .collection {
     --collection-pad: 16px;
-    --card-w: 62vw;
-    --card-gap: 16px;
+    --card-w: 21vw;
+    --card-gap: 8px;
 
     padding-block: 32px 30px;
   }

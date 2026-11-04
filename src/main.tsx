@@ -5,18 +5,21 @@ import { CartProvider } from './context/cart/CartProvider'
 import { InventoryProvider } from './context/inventory/InventoryProvider'
 import { ProductModalProvider } from './context/productModal/ProductModalProvider'
 import { ThemeProvider } from './theme/ThemeProvider'
+import { CatalogProvider } from './context/catalog/CatalogProvider'
 import './styles/global.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ThemeProvider>
-      <InventoryProvider>
-        <CartProvider>
-          <ProductModalProvider>
-            <App />
-          </ProductModalProvider>
-        </CartProvider>
-      </InventoryProvider>
+      <CatalogProvider>
+        <InventoryProvider>
+          <CartProvider>
+            <ProductModalProvider>
+              <App />
+            </ProductModalProvider>
+          </CartProvider>
+        </InventoryProvider>
+      </CatalogProvider>
     </ThemeProvider>
   </StrictMode>,
 )

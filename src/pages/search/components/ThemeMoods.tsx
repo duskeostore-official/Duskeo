@@ -1,4 +1,4 @@
-import { PRODUCTS } from '../../../data/products'
+import { useCatalog } from '../../../context/catalog/useCatalog'
 import { PRODUCT_THEMES, THEME_MOODS } from '../../../data/searchConfig'
 import type { Product, ProductTheme } from '../../../types'
 
@@ -11,6 +11,7 @@ interface ThemeMoodsProps {
 
 /** "Shop by mood" — large image tiles that double as theme filters. */
 export function ThemeMoods({ selected, onToggle, pool }: ThemeMoodsProps) {
+  const catalog = useCatalog()
   return (
     <section className="moods" aria-label="Shop by mood">
       <div className="moods-head">
@@ -18,7 +19,7 @@ export function ThemeMoods({ selected, onToggle, pool }: ThemeMoodsProps) {
       </div>
       <div className="moods-list">
         {PRODUCT_THEMES.map((theme) => {
-          const cover = PRODUCTS.find((p) => p.theme === theme)?.photos[0].src
+          const cover = catalog.products.find((p) => p.theme === theme)?.photos[0].src
           const count = pool.filter((p) => p.theme === theme).length
           const isOn = selected.includes(theme)
           return (

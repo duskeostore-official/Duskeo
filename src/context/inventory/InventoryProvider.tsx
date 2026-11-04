@@ -4,9 +4,14 @@ import type { Size, Stock } from '../../types'
 import { sanitizeStock as sanitize, zeroStock } from '../../utils/inventory'
 import { readJson, writeJson } from '../../utils/storage'
 import { InventoryContext } from './inventoryContext'
+import { useCatalog } from '../catalog/useCatalog'
 
 export function InventoryProvider({ children }: { children: ReactNode }) {
-  const [stock, setStock] = useState<Stock>(() => sanitize(readJson<Partial<Stock> | null>(STORAGE_KEYS.inventory, null)))
+  const catalog = useCatalog()
+  const productNames = useMemo(() => catalog.products.map((product) => product.name), [catalog.products])
+  const [stock, setStock] = useState<Stock>(() =>
+    sanitize(readJson<Partial<Stock> | null>(STORAGE_KEYS.inventory, null), productNames),
+  )
   const stockRef = useRef(stock)
 
   useEffect(() => {
@@ -24,8 +29,8 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
     return true
   }, [])
 
-  const replace = useCallback((next: Stock) => setStock(sanitize(next)), [])
-  const reset = useCallback(() => setStock(zeroStock()), [])
+  const replace = useCallback((next: Stock) => setStock(sanitize(next, productNames)), [productNames])
+  const reset = useCallback(() => setStock(zeroStock(productNames)), [productNames])
 
   const value = useMemo(() => ({ stock, quantity, take, replace, reset }), [stock, quantity, take, replace, reset])
 

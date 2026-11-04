@@ -4,7 +4,7 @@ import { ProductRail } from '../../components/productCard/ProductRail'
 import { RAIL_SPEEDS, titleFor } from '../../constants/site'
 import { useInventory } from '../../context/inventory/useInventory'
 import { useProductModal } from '../../context/productModal/useProductModal'
-import { PRODUCTS } from '../../data/products'
+import { useCatalog } from '../../context/catalog/useCatalog'
 import {
   EMPTY_FILTERS,
   MIN_RAIL_ITEMS,
@@ -28,10 +28,6 @@ import './SearchPage.css'
 /** New random order of themed rails (and their items) on every page load. */
 const SESSION_SEED = Math.floor(Math.random() * 100_000) + 1
 
-const THEMED_RAILS: ThemedRail[] = seededShuffle(SEARCH_RAILS, SESSION_SEED)
-  .map((rail, i) => ({ ...rail, products: seededShuffle(PRODUCTS.filter(rail.match), SESSION_SEED + i + 1) }))
-  .filter((rail) => rail.products.length >= MIN_RAIL_ITEMS)
-
 type Sheet = 'sort' | 'filter' | null
 
 interface SearchPageProps {
@@ -42,6 +38,7 @@ interface SearchPageProps {
 
 export function SearchPage({ initialQuery, mode }: SearchPageProps) {
   const isExplore = mode === 'explore'
+  const catalog = useCatalog()
   const [query, setQuery] = useState(initialQuery)
   const [sort, setSort] = useState<SortKey>('relevance')
   const [filters, setFilters] = useState<SearchFilters>(EMPTY_FILTERS)
@@ -57,19 +54,30 @@ export function SearchPage({ initialQuery, mode }: SearchPageProps) {
     document.title = titleFor(isExplore ? 'Explore the Collection' : term ? `Search: ${term}` : 'Search')
   }, [term, mode, isExplore])
 
-  const pool = useMemo(() => searchProducts(PRODUCTS, term), [term])
+  const pool = useMemo(() => searchProducts(catalog.products, term), [term, catalog.products])
   const poolProducts = useMemo(() => pool.map((r) => r.product), [pool])
   const results = useMemo(
     () => sortResults(applyFilters(pool, filters, inventory.quantity), sort),
     [pool, filters, inventory.quantity, sort],
   )
 
+  const themedRails = useMemo<ThemedRail[]>(
+    () =>
+      seededShuffle(SEARCH_RAILS, SESSION_SEED)
+        .map((rail, i) => ({
+          ...rail,
+          products: seededShuffle(catalog.products.filter(rail.match), SESSION_SEED + i + 1),
+        }))
+        .filter((rail) => rail.products.length >= MIN_RAIL_ITEMS),
+    [catalog.products],
+  )
+
   // Rails matching the top result's theme come first, so they relate to the search.
   const rails = useMemo(() => {
     const top = results[0]
-    if (!top) return THEMED_RAILS
-    return [...THEMED_RAILS].sort((a, b) => Number(b.match(top)) - Number(a.match(top)))
-  }, [results])
+    if (!top) return themedRails
+    return [...themedRails].sort((a, b) => Number(b.match(top)) - Number(a.match(top)))
+  }, [results, themedRails])
 
   const filterCount = activeFilterCount(filters)
   const sortLabel = SORT_OPTIONS.find((o) => o.key === sort)?.label
