@@ -5,8 +5,8 @@ export interface CatalogContextValue {
   products: Product[]
   customProducts: Product[]
   deletedSlugs: string[]
-  addProduct: (product: Product) => { ok: boolean; error?: string }
-  deleteProduct: (slug: string) => void
+  addProduct: (product: Product) => Promise<{ ok: boolean; error?: string }>
+  deleteProduct: (slug: string) => Promise<{ ok: boolean; error?: string }>
   findProduct: (slug: string) => Product | undefined
 }
 

@@ -1,7 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import { ADMIN_PASSCODE_MIN_LENGTH } from '../../constants/site'
-import { STORAGE_KEYS } from '../../constants/storage'
-import { readString, writeString } from '../../utils/storage'
+import { supabase } from '../../lib/supabase'
 
 interface AdminLoginProps {
   onSuccess: () => void
@@ -9,22 +7,32 @@ interface AdminLoginProps {
 }
 
 export function AdminLogin({ onSuccess, onCancel }: AdminLoginProps) {
-  const [existing] = useState(() => readString(STORAGE_KEYS.adminPasscode))
+  const [email, setEmail] = useState('')
   const [pass, setPass] = useState('')
-  const [confirm, setConfirm] = useState('')
   const [status, setStatus] = useState('')
-  const hasPass = !!existing
+  const [busy, setBusy] = useState(false)
 
-  const submit = (e: FormEvent) => {
-    e.preventDefault()
-    if (!hasPass) {
-      if (pass.length < ADMIN_PASSCODE_MIN_LENGTH) return setStatus(`Use at least ${ADMIN_PASSCODE_MIN_LENGTH} characters.`)
-      if (pass !== confirm) return setStatus('Passcodes do not match.')
-      writeString(STORAGE_KEYS.adminPasscode, pass)
-    } else if (pass !== existing) {
-      return setStatus('Incorrect passcode.')
+  const submit = async (event: FormEvent) => {
+    event.preventDefault()
+    setBusy(true)
+    setStatus('')
+    const { error } = await supabase.auth.signInWithPassword({
+      email: email.trim(),
+      password: pass,
+    })
+    if (error) {
+      setStatus(error.message)
+      setBusy(false)
+      return
     }
-    writeString(STORAGE_KEYS.adminSession, '1', sessionStorage)
+    const { data, error: adminError } = await supabase.rpc('is_admin')
+    if (adminError || data !== true) {
+      await supabase.auth.signOut()
+      setStatus('This account is not authorized as a DUSKEO administrator.')
+      setBusy(false)
+      return
+    }
+    setBusy(false)
     onSuccess()
   }
 
@@ -32,43 +40,29 @@ export function AdminLogin({ onSuccess, onCancel }: AdminLoginProps) {
     <div className="inventory-login open" role="dialog" aria-modal="true" aria-label="DUSKEO admin login">
       <div className="inventory-login-panel">
         <p className="inventory-login-kicker">DUSKEO / PRIVATE ACCESS</p>
-        <h2>{hasPass ? 'ADMIN SIGN IN' : 'CREATE ADMIN PASSCODE'}</h2>
-        <p>
-          {hasPass
-            ? 'Enter your admin passcode to manage product stock.'
-            : 'Create a passcode for this browser to open inventory controls.'}
-        </p>
+        <h2>ADMIN SIGN IN</h2>
+        <p>Sign in with the administrator account configured in Supabase.</p>
         <form onSubmit={submit}>
           <input
+            type="email"
+            autoComplete="email"
+            placeholder="Administrator email"
+            required
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+          />
+          <input
             type="password"
-            autoComplete={hasPass ? 'current-password' : 'new-password'}
-            placeholder="Admin passcode"
+            autoComplete="current-password"
+            placeholder="Password"
             required
             value={pass}
-            onChange={(e) => setPass(e.target.value)}
+            onChange={(event) => setPass(event.target.value)}
           />
-          {!hasPass && (
-            <input
-              type="password"
-              autoComplete="new-password"
-              placeholder="Confirm passcode"
-              required
-              value={confirm}
-              onChange={(e) => setConfirm(e.target.value)}
-            />
-          )}
-          <button type="submit">{hasPass ? 'SIGN IN' : 'CREATE PASSCODE'}</button>
+          <button type="submit" disabled={busy}>{busy ? 'SIGNING IN…' : 'SIGN IN'}</button>
         </form>
-        <p className="inventory-login-status" aria-live="polite">
-          {status}
-        </p>
-        <button type="button" onClick={onCancel}>
-          CANCEL
-        </button>
-        <p className="inventory-login-note">
-          Prototype access only. A static HTML site cannot provide secure authentication. Use server-side
-          authentication before publishing.
-        </p>
+        <p className="inventory-login-status" aria-live="polite">{status}</p>
+        <button type="button" onClick={onCancel}>CANCEL</button>
       </div>
     </div>
   )

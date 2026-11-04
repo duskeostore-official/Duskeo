@@ -1,7 +1,6 @@
 import { useState, type FormEvent } from 'react'
-import { STORAGE_KEYS } from '../../../constants/storage'
-import type { RestockRequest, Size } from '../../../types'
-import { readJson, writeJson } from '../../../utils/storage'
+import { supabase } from '../../../lib/supabase'
+import type { Size } from '../../../types'
 
 interface NotifyStockFormProps {
   product: string
@@ -9,25 +8,29 @@ interface NotifyStockFormProps {
   visible: boolean
 }
 
-/** Shown when the selected size is sold out; saves a restock request locally. */
 export function NotifyStockForm({ product, size, visible }: NotifyStockFormProps) {
   const [email, setEmail] = useState('')
   const [result, setResult] = useState('')
+  const [busy, setBusy] = useState(false)
 
-  const submit = (e: FormEvent) => {
-    e.preventDefault()
+  const submit = async (event: FormEvent) => {
+    event.preventDefault()
     const trimmed = email.trim()
     if (!trimmed) return
-    const requests = readJson<RestockRequest[]>(STORAGE_KEYS.restockRequests, [])
-    requests.push({ product, size, email: trimmed, requestedAt: new Date().toISOString() })
-    writeJson(STORAGE_KEYS.restockRequests, requests)
-    setResult('Request saved on this device. Email alerts need a connected backend.')
-    setEmail('')
+    setBusy(true)
+    const { error } = await supabase.from('restock_requests').insert({
+      product,
+      size,
+      email: trimmed,
+    })
+    setResult(error ? 'Could not save your request. Please try again.' : 'Restock request saved.')
+    if (!error) setEmail('')
+    setBusy(false)
   }
 
   return (
     <form className={`notify-stock${visible ? ' show' : ''}`} onSubmit={submit}>
-      <p>This size is currently sold out. Leave your email and we’ll save a restock request on this device.</p>
+      <p>This size is currently sold out. Leave your email and we’ll save a restock request.</p>
       <input
         type="email"
         name="email"
@@ -35,12 +38,10 @@ export function NotifyStockForm({ product, size, visible }: NotifyStockFormProps
         required
         aria-label="Email address for restock request"
         value={email}
-        onChange={(e) => setEmail(e.target.value)}
+        onChange={(event) => setEmail(event.target.value)}
       />
-      <button type="submit">NOTIFY ME WHEN AVAILABLE</button>
-      <p className="notify-result" aria-live="polite">
-        {result}
-      </p>
+      <button type="submit" disabled={busy}>{busy ? 'SAVING…' : 'NOTIFY ME WHEN AVAILABLE'}</button>
+      <p className="notify-result" aria-live="polite">{result}</p>
     </form>
   )
 }

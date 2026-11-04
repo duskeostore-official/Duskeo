@@ -1,0 +1,43 @@
+.profile-auth-form {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.profile-auth-form input {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--c-border-input);
+  background: var(--c-bg-elevated);
+  color: var(--c-text-strong);
+  padding: 12px;
+}
+
+.profile-auth-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.profile-auth-tabs button {
+  border: 1px solid var(--c-border-muted);
+  background: transparent;
+  color: var(--c-text-strong);
+  padding: 10px;
+}
+
+.profile-auth-tabs button.active {
+  background: var(--c-text-strong);
+  color: var(--c-bg-elevated);
+}
+
+.profile-account {
+  display: grid;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.profile-account strong {
+  overflow-wrap: anywhere;
+}

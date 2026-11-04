@@ -23,15 +23,15 @@ export function InventoryAdmin({ onClose }: { onClose: () => void }) {
   const setQty = (product: string, size: Size, value: string) =>
     setDraft((d) => ({ ...d, [product]: { ...d[product], [size]: Math.max(0, Math.floor(Number(value) || 0)) } }))
 
-  const save = () => {
-    inventory.replace(draft)
-    setStatus('Stock saved in this browser. Product availability has been refreshed.')
+  const save = async () => {
+    const result = await inventory.replace(draft)
+    setStatus(result.ok ? 'Stock saved in Supabase. Product availability has been refreshed.' : result.error ?? 'Could not save stock.')
   }
 
-  const reset = () => {
-    inventory.reset()
+  const reset = async () => {
+    const result = await inventory.reset()
     setDraft(zeroStock(catalog.products.map((product) => product.name)))
-    setStatus('All stock quantities reset to zero.')
+    setStatus(result.ok ? 'All stock quantities reset to zero in Supabase.' : result.error ?? 'Could not reset stock.')
   }
 
   const readPhoto = (file: File) =>
@@ -70,7 +70,7 @@ export function InventoryAdmin({ onClose }: { onClose: () => void }) {
     }
   }
 
-  const addProduct = () => {
+  const addProduct = async () => {
     const cleanName = name.trim().replace(/\s+/g, ' ')
     const numericPrice = Math.floor(Number(price))
     if (!cleanName) return setStatus('Enter a product name.')
@@ -108,7 +108,7 @@ export function InventoryAdmin({ onClose }: { onClose: () => void }) {
       ],
     }
 
-    const result = catalog.addProduct(product)
+    const result = await catalog.addProduct(product)
     if (!result.ok) return setStatus(result.error ?? 'Could not add the product.')
     setDraft((current) => ({
       ...current,
@@ -122,19 +122,19 @@ export function InventoryAdmin({ onClose }: { onClose: () => void }) {
     setStatus(`Product "${product.name}" uploaded successfully.`)
   }
 
-  const deleteProduct = (product: Product) => {
+  const deleteProduct = async (product: Product) => {
     if (!window.confirm(`Delete "${product.name}"? This cannot be undone.`)) return
     const nextStock = { ...inventory.stock }
     delete nextStock[product.name]
-    inventory.replace(nextStock)
+    await inventory.replace(nextStock)
     cart.remove(product.name)
-    catalog.deleteProduct(product.slug)
+    const result = await catalog.deleteProduct(product.slug)
     setDraft((current) => {
       const next = { ...current }
       delete next[product.name]
       return next
     })
-    setStatus(`Product "${product.name}" deleted.`)
+    setStatus(result.ok ? `Product "${product.name}" deleted.` : result.error ?? 'Could not delete the product.')
   }
 
   return (
@@ -153,9 +153,9 @@ export function InventoryAdmin({ onClose }: { onClose: () => void }) {
           </button>
         </div>
         <p className="admin-warning">
-          Set the real available quantity for every product and size. Stock is saved only in this browser on this
-          device. This demo panel has no login protection and is not a secure production admin system. Initial
-          quantities are set to zero so the site does not claim stock you have not entered.
+          Set the real available quantity for every product and size. Stock is saved in Supabase and shared across
+          all visitors. Access is restricted to authenticated administrator accounts. Initial quantities are set
+          to zero until you enter inventory.
         </p>
         <section className="product-admin-form" aria-labelledby="upload-product-heading">
           <h3 id="upload-product-heading">ADD PRODUCT</h3>
