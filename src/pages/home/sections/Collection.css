@@ -45,12 +45,14 @@
   flex-direction: column;
 }
 
-/* Phones: one card at a time, centered (rail mode: see ProductRail.css). */
+/* Phones: two cards per view, stepping one card at a time (rail mode: see ProductRail.css). */
 @media (max-width: 700px) {
   .collection {
     --collection-pad: 16px;
-    --card-w: 21vw;
-    --card-gap: 8px;
+    /* Two cards plus one gap fill the width inside the side gutters. */
+    --card-w: calc((100vw - 2 * var(--collection-pad) - var(--card-gap)) / 2);
+    /* Gap grows with the screen: ~16px on small phones up to 28px on large ones. */
+    --card-gap: clamp(16px, 5vw, 28px);
 
     padding-block: 32px 30px;
   }

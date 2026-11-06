@@ -1,31 +1,152 @@
-.drawer-item {
-  display: flex;
-  justify-content: space-between;
-  gap: 15px;
-  padding: 17px 0;
+/* Sizes are in em, so everything follows the bag's fluid text size (see Drawer.css). */
+
+/* The list scrolls; the total and checkout stay in view. */
+.cart-items {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.cart-empty {
+  margin: 3em 0;
+  text-align: center;
+  color: var(--c-muted);
+}
+
+.cart-line {
+  display: grid;
+  grid-template-columns: clamp(76px, 7vw, 120px) minmax(0, 1fr) auto;
+  gap: clamp(14px, 1.6vw, 28px);
+  align-items: start;
+  padding: 1.2em 0;
   border-bottom: 1px solid var(--c-line);
-  font-size: 13px;
 }
 
-.drawer-item button {
-  background: transparent;
+.cart-line-photo {
+  display: block;
+  width: 100%;
+  aspect-ratio: 0.84;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  background: var(--c-bg-media);
+}
+
+.cart-line-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35em;
+  min-width: 0;
+}
+
+.cart-line-name {
+  font-size: 1.05em;
+  letter-spacing: 0.06em;
+  overflow-wrap: anywhere;
+}
+
+.cart-line-price {
+  font-size: 0.85em;
+  color: var(--c-muted);
+}
+
+.cart-line-total {
+  font-size: 1.05em;
+  white-space: nowrap;
+}
+
+.cart-line-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.7em 1em;
+  margin-top: 0.7em;
+}
+
+.cart-size {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  font-size: 0.75em;
+  letter-spacing: 0.15em;
+  color: var(--c-muted);
+}
+
+.cart-size select {
+  font: inherit;
+  font-size: 1.2em;
+  letter-spacing: 0.05em;
+  color: var(--c-text-strong);
+  background: var(--c-bg-media);
   border: 1px solid var(--c-border-input);
-  padding: 3px 8px;
+  padding: 0.45em 2em 0.45em 0.8em;
+  appearance: none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, currentColor 50%),
+    linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position:
+    calc(100% - 1.05em) 55%,
+    calc(100% - 0.75em) 55%;
+  background-size: 0.3em 0.3em;
+  background-repeat: no-repeat;
+  cursor: pointer;
 }
 
-.drawer-item .cart-remove {
+.cart-qty {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--c-border-input);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.cart-qty button {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  width: 2.2em;
+  height: 2.2em;
+  font-size: 1em;
+}
+
+.cart-qty button:hover {
+  background: rgba(var(--c-shade-rgb), 0.25);
+}
+
+.cart-qty span {
+  min-width: 2em;
+  text-align: center;
+}
+
+.cart-remove {
   border: 0;
   background: none;
   color: var(--c-muted);
   text-decoration: underline;
-  font-size: 9px;
-  letter-spacing: 0.1em;
-  margin-left: 8px;
-  padding: 0;
+  font-size: 0.7em;
+  letter-spacing: 0.12em;
+  padding: 0.4em 0;
 }
 
-.drawer-total {
+.cart-foot {
+  flex: none;
+  border-top: 1px solid var(--c-border-strong);
+}
+
+.cart-foot .drawer-total {
   display: flex;
   justify-content: space-between;
-  margin: 24px 0;
+  align-items: baseline;
+  margin: 1.1em 0;
+  font-size: 1.15em;
+}
+
+/* Phones: price total moves under the details. */
+@media (max-width: 600px) {
+  .cart-line {
+    grid-template-columns: 84px minmax(0, 1fr);
+  }
+
+  .cart-line-total {
+    grid-column: 2;
+  }
 }

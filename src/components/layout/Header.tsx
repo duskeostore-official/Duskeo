@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import logo from '../../assets/images/brand/logo.webp'
 import { ROUTES } from '../../constants/routes'
 import { SHOW_THEME_TOGGLE } from '../../constants/theme'
 import { useCart } from '../../context/cart/useCart'
 import { CartIcon, ProfileIcon, SearchIcon } from '../common/Icons'
 import { ThemeToggle } from '../theme/ThemeToggle'
+import { MobileMenu } from './MobileMenu'
 import './Header.css'
 
 interface HeaderProps {
@@ -13,26 +14,20 @@ interface HeaderProps {
 
 export function Header({ onOpenProfile }: HeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false)
+  const closeMenu = useCallback(() => setMenuOpen(false), [])
   const cart = useCart()
 
   return (
     <header className="header">
-      <div className={`leftnav${menuOpen ? ' menu-open' : ''}`}>
-        <button
-          className="menu-toggle"
-          aria-label="Open menu"
-          aria-expanded={menuOpen}
-          onClick={() => setMenuOpen((o) => !o)}
-        >
+      <div className="leftnav">
+        <button className="menu-toggle" aria-label="Open menu" aria-expanded={menuOpen} onClick={() => setMenuOpen(true)}>
           ☰
         </button>
         <nav className="nav">
           <a href={ROUTES.collection}>SHOP</a>
-          <a className="mobile-story-link" href={ROUTES.ourStory}>
-            OUR STORY
-          </a>
         </nav>
       </div>
+      <MobileMenu open={menuOpen} onClose={closeMenu} onOpenProfile={onOpenProfile} />
 
       <a aria-label="DUSKEO home" href={ROUTES.top}>
         <img className="logo" src={logo} alt="DUSKEO official logo" />

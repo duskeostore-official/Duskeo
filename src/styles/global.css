@@ -9,6 +9,10 @@
   /* Visible screen height below the header. svh = stable on mobile
      (ignores the browser toolbar showing/hiding); vh is the fallback. */
   --screen-h: calc(100vh - var(--header-h));
+  /* Corner radius scale: controls, cards/photos, large panels. */
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
 }
 
 @supports (height: 100svh) {
@@ -128,4 +132,61 @@ button {
     font-size: 9px;
     letter-spacing: 0.13em;
   }
+}
+
+/* ---------- Rounded corners (whole site) ---------- */
+button,
+input,
+select,
+textarea,
+.outline,
+.add {
+  border-radius: var(--radius-sm);
+}
+
+/* Photos and media frames */
+.product-card .product-open-link,
+.product-detail-main-photo,
+.product-detail-thumb,
+.quick-add-product img,
+.hero-art,
+.collection .view {
+  border-radius: var(--radius-md);
+}
+
+/* Cards and boxed sections */
+.review-card,
+.story,
+.mood,
+.search-bar,
+.search-tools,
+.policy-contact,
+.notify-stock,
+.product-admin-form,
+.product-photo-upload,
+.story-page-value {
+  border-radius: var(--radius-md);
+}
+
+/* Large panels */
+.pmodal-panel,
+.product-detail-page,
+.story-page-main,
+.inventory-login-panel,
+.inventory-admin-panel {
+  border-radius: var(--radius-lg);
+}
+
+button,
+.outline,
+.add {
+  transition:
+    background-color 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.2s var(--ease-apple);
+}
+
+button:active:not(:disabled) {
+  transform: scale(0.97);
 }

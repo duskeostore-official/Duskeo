@@ -1,0 +1,121 @@
+/* Centered, narrower panel on wide screens; full width on phones. */
+.quick-add {
+  justify-content: center;
+}
+
+.quick-add .sheet-panel {
+  max-width: 480px;
+}
+
+.quick-add-product {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  padding: 12px 0 4px;
+}
+
+.quick-add-product img {
+  width: 64px;
+  height: 80px;
+  object-fit: cover;
+  background: var(--c-bg-media);
+}
+
+.quick-add-product div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+}
+
+.quick-add-product span {
+  color: var(--c-muted);
+}
+
+.quick-add-pincode {
+  margin-top: 18px;
+}
+
+.quick-add-pincode label {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  margin-bottom: 10px;
+}
+
+.quick-add-pincode > div {
+  display: flex;
+  gap: 8px;
+}
+
+.quick-add-pincode input {
+  flex: 1;
+  min-width: 0;
+  padding: 12px;
+  background: var(--c-bg-media);
+  border: 1px solid var(--c-border-input);
+  color: var(--c-text);
+  font-size: 14px;
+  letter-spacing: 0.15em;
+}
+
+.quick-add-pincode button {
+  border: 1px solid var(--c-border-strong);
+  background: transparent;
+  padding: 0 16px;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+}
+
+.quick-add-delivery {
+  font-size: 11px;
+  color: var(--c-muted);
+  line-height: 1.6;
+  margin: 10px 0 0;
+}
+
+.quick-add-delivery.is-blocked {
+  color: var(--c-text);
+}
+
+.quick-add .product-size-heading {
+  margin-top: 22px;
+}
+
+.quick-add .product-size-options {
+  flex-wrap: wrap;
+}
+
+.quick-add-status {
+  min-height: 1.6em;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  margin: 14px 0 0;
+}
+
+.quick-add-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.quick-add-submit {
+  width: 100%;
+  margin: 0;
+  padding: 15px 20px;
+}
+
+.quick-add-submit:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+}
+
+.quick-add-details {
+  border: 0;
+  background: none;
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  color: var(--c-muted);
+  padding: 4px;
+}

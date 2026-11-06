@@ -12,7 +12,13 @@ export const ROUTES = {
   explore: '#explore',
   admin: '#admin',
   policyPrefix: '#policy-',
+  /** Signed-in customer pages */
+  orders: '#orders',
+  orderPrefix: '#order-',
+  addresses: '#addresses',
 } as const
+
+export const orderHref = (id: number) => `${ROUTES.orderPrefix}${id}`
 
 /** In-page anchors on the home view. */
 export const HOME_ANCHORS = ['collection', 'story', 'reviews', 'footer'] as const

@@ -32,8 +32,9 @@ export function ProductDetails({ product, showCollectionLink = true }: ProductDe
   useEffect(() => () => window.clearTimeout(timer.current), [])
 
   const addToBag = async () => {
+    if (!cart.canAdd(product.name, size)) return
     if (!(await inventory.take(product.name, size))) return
-    cart.add(`${product.name} — ${size}`, product.price)
+    cart.add(product.name, size, product.price)
     setJustAdded(true)
     window.clearTimeout(timer.current)
     timer.current = window.setTimeout(() => setJustAdded(false), ADDED_FEEDBACK_MS)

@@ -11,6 +11,9 @@ import { DEFAULT_TITLE, titleFor } from './constants/site'
 import { useCatalog } from './context/catalog/useCatalog'
 import { POLICIES } from './data/policies'
 import { useHashRoute } from './hooks/useHashRoute'
+import { AddressesPage } from './pages/account/AddressesPage'
+import { OrderDetailPage } from './pages/account/OrderDetailPage'
+import { OrdersPage } from './pages/account/OrdersPage'
 import { FaqPage } from './pages/faq/FaqPage'
 import { HomePage } from './pages/home/HomePage'
 import { PoliciesPage } from './pages/policies/PoliciesPage'
@@ -25,6 +28,12 @@ function pageTitle(route: Route, findProduct: (slug: string) => { name: string }
       return titleFor('Our Story')
     case 'faq':
       return titleFor('FAQ')
+    case 'orders':
+      return titleFor('My Orders')
+    case 'order':
+      return titleFor('Order Details')
+    case 'addresses':
+      return titleFor('Saved Addresses')
     case 'search':
       if (route.mode === 'explore') return titleFor('Explore the Collection')
       return titleFor(route.query ? `Search: ${route.query}` : 'Search')
@@ -37,12 +46,26 @@ function pageTitle(route: Route, findProduct: (slug: string) => { name: string }
   }
 }
 
-function CurrentPage({ route, findProduct }: { route: Route; findProduct: (slug: string) => Product | undefined }) {
+function CurrentPage({
+  route,
+  findProduct,
+  onOpenProfile,
+}: {
+  route: Route
+  findProduct: (slug: string) => Product | undefined
+  onOpenProfile: () => void
+}) {
   switch (route.view) {
     case 'story':
       return <StoryPage />
     case 'faq':
       return <FaqPage />
+    case 'orders':
+      return <OrdersPage onOpenProfile={onOpenProfile} />
+    case 'order':
+      return <OrderDetailPage key={route.orderId} orderId={route.orderId} onOpenProfile={onOpenProfile} />
+    case 'addresses':
+      return <AddressesPage onOpenProfile={onOpenProfile} />
     case 'search':
       // Re-mount on real navigation to a new query (typing only replaces the URL).
       return <SearchPage key={`${route.mode}-${route.query}`} initialQuery={route.query} mode={route.mode} />
@@ -76,7 +99,7 @@ export default function App() {
     <>
       <LogoFilters />
       <Header onOpenProfile={() => setProfileOpen(true)} />
-      <CurrentPage route={route} findProduct={catalog.findProduct} />
+      <CurrentPage route={route} findProduct={catalog.findProduct} onOpenProfile={() => setProfileOpen(true)} />
       <Footer />
       <ProductModal />
       <CartDrawer />

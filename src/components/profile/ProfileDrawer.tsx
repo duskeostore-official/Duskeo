@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import type { User } from '@supabase/supabase-js'
 import { supabase } from '../../lib/supabase'
+import { AccountSections } from '../account/AccountSections'
 import { Drawer } from '../common/Drawer'
 import './ProfileDrawer.css'
 
@@ -57,25 +58,11 @@ export function ProfileDrawer({ open, onClose }: ProfileDrawerProps) {
     setBusy(false)
   }
 
-  const signOut = async () => {
-    setBusy(true)
-    await supabase.auth.signOut()
-    setStatus('')
-    setPassword('')
-    setBusy(false)
-  }
-
   return (
-    <Drawer open={open} title="YOUR ACCOUNT" onClose={onClose}>
+    <Drawer open={open} title="YOUR ACCOUNT" onClose={onClose} size="small">
       {user ? (
-        <div className="profile-account">
-          <p className="small-note">SIGNED IN</p>
-          <strong>{user.user_metadata?.full_name || user.email || 'DUSKEO customer'}</strong>
-          {user.email && <span className="small-note">{user.email}</span>}
-          <button className="outline" type="button" onClick={() => void signOut()} disabled={busy}>
-            {busy ? 'SIGNING OUT…' : 'SIGN OUT'}
-          </button>
-        </div>
+        // Signed in: same sections as the phone menu (theme, profile, orders, addresses, sign out).
+        <AccountSections onNavigate={onClose} />
       ) : (
         <>
           <p className="small-note">Sign in to your DUSKEO account.</p>

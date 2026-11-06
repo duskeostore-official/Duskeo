@@ -1,0 +1,96 @@
+/* Backdrop: stays mounted so the panel can slide in and out. */
+.mmenu {
+  position: fixed;
+  inset: 0;
+  z-index: 25;
+  display: flex;
+  background: rgba(var(--c-shade-rgb), 0);
+  visibility: hidden;
+  transition:
+    background 0.35s ease,
+    visibility 0s linear 0.45s;
+}
+
+.mmenu.open {
+  background: rgba(var(--c-shade-rgb), 0.6);
+  visibility: visible;
+  transition: background 0.35s ease;
+}
+
+.mmenu-panel {
+  display: flex;
+  flex-direction: column;
+  width: min(420px, 100%);
+  height: 100%;
+  /* Visible screen height, so the bottom (sign out) is never hidden behind the phone's browser bar. */
+  height: 100dvh;
+  background: var(--c-bg-surface);
+  color: var(--c-text-strong);
+  border-right: 1px solid var(--c-border-strong);
+  border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+  font-size: 15px;
+  transform: translateX(-100%);
+  transition: transform 0.45s var(--ease-apple);
+}
+
+.mmenu.open .mmenu-panel {
+  transform: none;
+}
+
+.mmenu-head {
+  flex: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid var(--c-border-strong);
+  letter-spacing: 0.2em;
+  font-size: 15px;
+}
+
+.mmenu-close {
+  border: 0;
+  background: none;
+  font-size: 26px;
+  line-height: 1;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+}
+
+.mmenu-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+  scrollbar-width: thin;
+  scrollbar-color: var(--c-border-muted) transparent;
+  padding: 6px 20px calc(28px + env(safe-area-inset-bottom, 0px));
+  /* Soft fade at the bottom edge hints that the list scrolls. */
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 28px), transparent);
+}
+
+.mmenu-body::-webkit-scrollbar {
+  width: 4px;
+}
+
+.mmenu-body::-webkit-scrollbar-thumb {
+  background: var(--c-border-muted);
+  border-radius: 4px;
+}
+
+@media (max-width: 480px) {
+  .mmenu-panel {
+    border-right: 0;
+    border-radius: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mmenu,
+  .mmenu-panel {
+    transition: none;
+  }
+}

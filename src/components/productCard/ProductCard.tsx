@@ -1,4 +1,5 @@
 import type { MouseEvent } from 'react'
+import { useQuickAdd } from '../../context/quickAdd/useQuickAdd'
 import { productHref } from '../../data/products'
 import type { Product } from '../../types'
 import { rupees } from '../../utils/format'
@@ -12,8 +13,9 @@ interface ProductCardProps {
   focusable?: boolean
 }
 
-/** Product tile. "ADD TO BAG" also opens the product so a size is always chosen. */
+/** Product tile. "ADD TO BAG" opens the size picker (PIN code + deliverable sizes). */
 export function ProductCard({ product, onOpen, focusable = true }: ProductCardProps) {
+  const quickAdd = useQuickAdd()
   const href = productHref(product.slug)
   const tabIndex = focusable ? undefined : -1
 
@@ -39,11 +41,7 @@ export function ProductCard({ product, onOpen, focusable = true }: ProductCardPr
         {product.name}
       </a>
       <div className="price">{rupees(product.price)}</div>
-      <button
-        className="add"
-        tabIndex={tabIndex}
-        onClick={(e) => (onOpen ? open(e) : (window.location.hash = href))}
-      >
+      <button className="add" tabIndex={tabIndex} onClick={() => quickAdd.open(product)}>
         ADD TO BAG +
       </button>
     </article>

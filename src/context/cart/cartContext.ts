@@ -1,5 +1,5 @@
 import { createContext } from 'react'
-import type { CartItem } from '../../types'
+import type { CartItem, Size } from '../../types'
 
 export interface CartContextValue {
   items: CartItem[]
@@ -8,9 +8,13 @@ export interface CartContextValue {
   isOpen: boolean
   open: () => void
   close: () => void
-  add: (name: string, price: number) => void
+  /** False once this size is at the per-line limit (10). */
+  canAdd: (product: string, size: Size) => boolean
+  add: (product: string, size: Size, price: number) => void
   increment: (name: string) => void
   decrement: (name: string) => void
+  /** Moves a line to another size (merges if that size is already in the bag). */
+  changeSize: (name: string, size: Size) => void
   remove: (name: string) => void
 }
 

@@ -7,4 +7,7 @@ export const STORAGE_KEYS = {
   adminPasscode: 'duskeo_admin_passcode_v1',
   adminSession: 'duskeo_admin_session_v1',
   theme: 'duskeo_theme_v1',
+  guestBag: 'duskeo_guest_bag_v1',
+  /** Last PIN code checked in the size picker. */
+  pincode: 'duskeo_pincode_v1',
 } as const

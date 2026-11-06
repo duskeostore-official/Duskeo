@@ -8,10 +8,12 @@ interface BottomSheetProps {
   children: ReactNode
   /** Sticky footer (e.g. "Show 12 results"). */
   footer?: ReactNode
+  /** Extra class on the overlay, for per-sheet sizing. */
+  className?: string
 }
 
 /** Mobile panel that slides up from the bottom of the screen. */
-export function BottomSheet({ open, title, onClose, children, footer }: BottomSheetProps) {
+export function BottomSheet({ open, title, onClose, children, footer, className }: BottomSheetProps) {
   useEffect(() => {
     if (!open) return
     const html = document.documentElement
@@ -27,7 +29,7 @@ export function BottomSheet({ open, title, onClose, children, footer }: BottomSh
 
   return (
     <div
-      className={`sheet${open ? ' open' : ''}`}
+      className={`sheet${open ? ' open' : ''}${className ? ` ${className}` : ''}`}
       aria-hidden={!open}
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >

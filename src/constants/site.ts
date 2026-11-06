@@ -1,6 +1,8 @@
 export const BRAND_NAME = 'DUSKEO'
 export const BRAND_TAGLINE = 'WEAR PROGRESS. REPEAT.'
 export const CONTACT_EMAIL = 'duskeo.store@gmail.com'
+/** Order "Help & support" emails go here (VITE_SUPPORT_EMAIL in .env). */
+export const SUPPORT_EMAIL: string = import.meta.env.VITE_SUPPORT_EMAIL || CONTACT_EMAIL
 export const INSTAGRAM_URL = 'https://www.instagram.com/duskeo.store/'
 export const INSTAGRAM_HANDLE = '@duskeo.store'
 

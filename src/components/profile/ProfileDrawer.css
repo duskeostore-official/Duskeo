@@ -1,7 +1,29 @@
+/* Sizes are in em, so the form follows the panel's fluid text size (see Drawer.css). */
+.profile-auth-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.6em;
+  margin-top: 1.3em;
+}
+
+.profile-auth-tabs button {
+  border: 1px solid var(--c-border-muted);
+  background: transparent;
+  color: var(--c-text-strong);
+  padding: 0.85em 0.6em;
+  font-size: 0.82em;
+  letter-spacing: 0.12em;
+}
+
+.profile-auth-tabs button.active {
+  background: var(--c-text-strong);
+  color: var(--c-bg-elevated);
+}
+
 .profile-auth-form {
   display: grid;
-  gap: 10px;
-  margin-top: 18px;
+  gap: 0.8em;
+  margin-top: 1.3em;
 }
 
 .profile-auth-form input {
@@ -10,34 +32,26 @@
   border: 1px solid var(--c-border-input);
   background: var(--c-bg-elevated);
   color: var(--c-text-strong);
-  padding: 12px;
+  padding: 0.9em 1em;
+  font-size: 1em;
 }
 
-.profile-auth-tabs {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  margin-top: 18px;
+.profile-auth-form input:focus {
+  outline: none;
+  border-color: var(--c-text-strong);
 }
 
-.profile-auth-tabs button {
-  border: 1px solid var(--c-border-muted);
-  background: transparent;
-  color: var(--c-text-strong);
-  padding: 10px;
-}
-
-.profile-auth-tabs button.active {
-  background: var(--c-text-strong);
-  color: var(--c-bg-elevated);
+.profile-auth-form .outline {
+  margin-top: 0.3em;
 }
 
 .profile-account {
   display: grid;
-  gap: 14px;
-  margin-top: 18px;
+  gap: 1em;
+  margin-top: 1.3em;
 }
 
 .profile-account strong {
+  font-size: 1.2em;
   overflow-wrap: anywhere;
 }

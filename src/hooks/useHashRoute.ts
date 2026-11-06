@@ -11,6 +11,12 @@ export function parseRoute(hash: string, products: Product[] = []): Route {
   const lower = hash.toLowerCase()
   if (lower === ROUTES.ourStory) return { view: 'story' }
   if (lower === ROUTES.faq) return { view: 'faq' }
+  if (lower === ROUTES.orders) return { view: 'orders' }
+  if (lower === ROUTES.addresses) return { view: 'addresses' }
+  if (lower.startsWith(ROUTES.orderPrefix)) {
+    const orderId = Number(lower.slice(ROUTES.orderPrefix.length))
+    if (Number.isInteger(orderId) && orderId > 0) return { view: 'order', orderId }
+  }
   for (const mode of ['search', 'explore'] as const) {
     const base = ROUTES[mode]
     if (lower === base || lower.startsWith(base + '?')) {

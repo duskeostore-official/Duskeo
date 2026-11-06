@@ -34,7 +34,10 @@ export interface Product {
 }
 
 export interface CartItem {
+  /** Line label and key, e.g. "LEVI AURA TEE — M" */
   name: string
+  product: string
+  size: Size
   price: number
   qty: number
 }
@@ -85,3 +88,6 @@ export type Route =
   | { view: 'product'; slug: string }
   | { view: 'policy'; policyId: string }
   | { view: 'faq' }
+  | { view: 'orders' }
+  | { view: 'order'; orderId: number }
+  | { view: 'addresses' }

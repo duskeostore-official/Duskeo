@@ -15,7 +15,7 @@
   display: block;
   width: 100%;
   overflow: hidden;
-  border-radius: 2px;
+  border-radius: var(--radius-md);
   transition: box-shadow 0.75s var(--ease-apple);
 }
 

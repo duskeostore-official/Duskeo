@@ -1,0 +1,336 @@
+/* Font sizes in em: 1em = 15px in the phone menu, larger in the profile pop-up on big screens. */
+.acct {
+  font-size: 1em;
+}
+
+.acct-section {
+  padding: 18px 0;
+  border-bottom: 1px solid var(--c-line);
+}
+
+.acct-section:last-child {
+  border-bottom: 0;
+}
+
+.acct-section h3 {
+  font-size: 0.733em;
+  font-weight: 400;
+  letter-spacing: 0.24em;
+  color: var(--c-muted);
+  margin: 0 0 12px;
+}
+
+.acct-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid var(--c-border-input);
+  border-radius: var(--radius-md);
+  background: transparent;
+  font-size: 1em;
+  text-align: left;
+}
+
+.acct-switch-track {
+  position: relative;
+  width: 46px;
+  height: 26px;
+  border-radius: 999px;
+  background: var(--c-border-input);
+  transition: background 0.25s ease;
+}
+
+.acct-switch-track span {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--c-text-strong);
+  transition: transform 0.3s var(--ease-apple);
+}
+
+.acct-switch-track.on {
+  background: var(--c-inverse);
+}
+
+.acct-switch-track.on span {
+  transform: translateX(20px);
+  background: var(--c-on-inverse);
+}
+
+.acct-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px 16px;
+  border: 1px solid var(--c-border-input);
+  border-radius: var(--radius-md);
+}
+
+.acct-card p {
+  margin: 0;
+  font-size: 0.933em;
+  line-height: 1.6;
+  color: var(--c-text-body, var(--c-text));
+}
+
+.acct-card .outline {
+  margin-top: 8px;
+}
+
+.acct-label {
+  font-size: 0.8em;
+  color: var(--c-muted);
+  letter-spacing: 0.04em;
+}
+
+.acct-card strong + .acct-label {
+  margin-top: 6px;
+}
+
+.acct-wrap {
+  overflow-wrap: anywhere;
+}
+
+.acct-empty {
+  margin: 0 0 12px;
+  font-size: 0.933em;
+  color: var(--c-muted);
+}
+
+.acct-list {
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 0;
+  display: grid;
+  gap: 10px;
+}
+
+.acct-order {
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.acct-order > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.acct-order-side {
+  align-items: flex-end;
+  text-align: right;
+}
+
+.acct-badge {
+  align-self: flex-start;
+  padding: 3px 9px;
+  border: 1px solid var(--c-border-muted);
+  border-radius: 999px;
+  font-size: 0.667em;
+  letter-spacing: 0.14em;
+  white-space: nowrap;
+}
+
+.acct-order-side .acct-badge {
+  align-self: flex-end;
+}
+
+.acct-badge.is-cancelled {
+  color: var(--c-muted);
+}
+
+.acct-address.is-default {
+  border-color: var(--c-text-strong);
+}
+
+.acct-address.is-default .acct-badge {
+  background: var(--c-inverse);
+  color: var(--c-on-inverse);
+  border-color: var(--c-inverse);
+}
+
+.acct-address-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.acct-address-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.acct-address-actions button,
+
+.acct-chips button {
+  border: 1px solid var(--c-border-muted);
+  background: transparent;
+  padding: 8px 12px;
+  font-size: 0.733em;
+  letter-spacing: 0.13em;
+}
+
+.acct-add {
+  width: 100%;
+}
+
+.acct-form {
+  gap: 10px;
+}
+
+.acct-form input,
+
+.acct-form select {
+  width: 100%;
+  padding: 12px 13px;
+  border: 1px solid var(--c-border-input);
+  background: var(--c-bg-elevated);
+  color: var(--c-text-strong);
+  font: inherit;
+  font-size: 1em;
+}
+
+.acct-form input:focus,
+
+.acct-form select:focus {
+  outline: none;
+  border-color: var(--c-text-strong);
+}
+
+.acct-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.acct-chips {
+  display: flex;
+  gap: 8px;
+}
+
+.acct-chips button.active {
+  background: var(--c-inverse);
+  color: var(--c-on-inverse);
+  border-color: var(--c-inverse);
+}
+
+.acct-check {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.933em;
+}
+
+.acct-check input {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+}
+
+.acct-form-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.acct-text-btn {
+  border: 0;
+  background: none;
+  color: var(--c-muted);
+  font-size: 0.733em;
+  letter-spacing: 0.15em;
+  padding: 8px;
+}
+
+.acct-status {
+  min-height: 1.4em;
+  margin: 10px 0 0;
+  font-size: 0.867em;
+  color: var(--c-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .acct-switch-track span {
+    transition: none;
+  }
+}
+
+.acct-form-title {
+  font-size: 0.8em;
+  letter-spacing: 0.2em;
+  margin-bottom: 2px;
+}
+
+.acct-signout {
+  width: 100%;
+}
+
+/* ---------- Inside the profile pop-up (larger screens): roomier, scrolls inside the panel ---------- */
+.drawer .acct {
+  padding-right: 0.4em; /* keeps cards clear of the scrollbar */
+}
+
+.drawer .acct-section {
+  padding: 1.6em 0;
+}
+
+.drawer .acct-section h3 {
+  margin-bottom: 1em;
+}
+
+.drawer .acct-card,
+.drawer .acct-row {
+  padding: 1.1em 1.3em;
+}
+
+.drawer .acct-card {
+  gap: 0.5em;
+}
+
+.drawer .acct-list {
+  gap: 0.9em;
+  margin-bottom: 1em;
+}
+
+.drawer .acct-form {
+  gap: 0.8em;
+}
+
+.drawer .acct-address-actions {
+  gap: 0.6em;
+  margin-top: 0.6em;
+}
+
+/* Order rows are links to the order page. */
+a.acct-order {
+  color: inherit;
+  transition:
+    border-color 0.25s ease,
+    background-color 0.25s ease;
+}
+
+a.acct-order:hover {
+  border-color: var(--c-text-strong);
+}
+
+.acct-view-all {
+  display: block;
+  margin: 0 0 1em;
+  padding: 0.6em 0;
+  font-size: 0.8em;
+  letter-spacing: 0.16em;
+  text-align: center;
+  color: var(--c-text-strong);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}

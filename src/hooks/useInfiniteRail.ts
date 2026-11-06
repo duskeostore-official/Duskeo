@@ -40,8 +40,8 @@ const easeInOutCubic = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2
  * Endless horizontal rail with two modes:
  * - Drift (desktop): moves continuously, glides to a stop while hovered,
  *   draggable and trackpad-scrollable.
- * - Step (phones, RAIL_STEP_QUERY): one centered card at a time; every few
- *   seconds it moves to the next card in one quick motion. Swipes snap to
+ * - Step (phones, RAIL_STEP_QUERY): the cards that fit are centered; every few
+ *   seconds it slides along by one card. Swipes snap to
  *   the next/previous card.
  *
  * The item set is rendered `copies` times and the position wraps at one
@@ -76,8 +76,13 @@ export function useInfiniteRail({ speed, direction, phase = 0 }: RailOptions) {
     if (!track || !st.setWidth) return
     const w = st.setWidth
     const wrapped = ((st.offset % w) + w) % w
-    // Step mode centers the active card; drift mode aligns to the left edge.
-    const shift = st.stepMode ? (st.viewportWidth - st.cardWidth) / 2 : 0
+    // Step mode centers the cards that fully fit; drift mode aligns to the left edge.
+    let shift = 0
+    if (st.stepMode && st.step) {
+      const gap = st.step - st.cardWidth
+      const visible = Math.max(1, Math.floor((st.viewportWidth + gap) / st.step))
+      shift = (st.viewportWidth - (visible * st.step - gap)) / 2
+    }
     // One extra set on the left so there is never a gap before the first card.
     track.style.transform = `translate3d(${shift - wrapped - w}px, 0, 0)`
   }, [])

@@ -1,40 +1,171 @@
+/* Backdrop: stays mounted so opening and closing can animate. */
 .shade {
-  display: none;
   position: fixed;
   inset: 0;
-  background: rgba(var(--c-shade-rgb), 0.73);
   z-index: 20;
-  justify-content: flex-end;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(var(--c-shade-rgb), 0);
+  visibility: hidden;
+  transition:
+    background 0.35s ease,
+    visibility 0s linear 0.45s;
 }
 
 .shade.open {
-  display: flex;
+  background: rgba(var(--c-shade-rgb), 0.73);
+  visibility: visible;
+  transition: background 0.35s ease;
 }
 
 .drawer {
+  /* Text scales smoothly from phones to large monitors. */
+  --drawer-text: clamp(15px, 0.35vw + 13px, 19px);
+  --drawer-pad: clamp(20px, 2.2vw, 40px);
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-height: 100%;
   background: var(--c-bg-surface);
   color: var(--c-text-strong);
-  width: min(400px, 100%);
-  height: 100%;
-  padding: 25px;
-  border-left: 1px solid var(--c-border-strong);
-  overflow: auto;
+  border: 1px solid var(--c-border-strong);
+  border-radius: var(--radius-lg);
+  padding: var(--drawer-pad);
+  font-size: var(--drawer-text);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  transform: translateY(24px) scale(0.96);
+  transition:
+    opacity 0.35s ease,
+    transform 0.5s var(--ease-apple),
+    width 0.4s var(--ease-apple),
+    height 0.4s var(--ease-apple);
+}
+
+.shade.open .drawer {
+  opacity: 1;
+  transform: none;
+}
+
+/* Desktop / laptop: account = half the screen, bag = 80% of the screen. */
+.drawer.is-small {
+  width: max(50vw, 440px);
+}
+
+.drawer.is-large {
+  width: 80vw;
+  height: 80vh;
+}
+
+/* Tablets */
+@media (max-width: 1000px) {
+  .drawer.is-small {
+    width: min(620px, 100%);
+  }
+
+  .drawer.is-large {
+    width: 100%;
+    height: 88vh;
+  }
 }
 
 .drawer-head {
+  flex: none;
   display: flex;
   justify-content: space-between;
+  align-items: center;
   border-bottom: 1px solid var(--c-border-strong);
-  padding-bottom: 16px;
+  padding-bottom: 0.9em;
+  font-size: clamp(16px, 0.6vw + 13px, 24px);
   letter-spacing: 0.15em;
+}
+
+.drawer-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  display: flex;
+  flex-direction: column;
 }
 
 .drawer-close {
   border: 0;
   background: none;
-  font-size: 22px;
+  font-size: 1.6em;
+  line-height: 1;
+  width: 1.6em;
+  height: 1.6em;
+  border-radius: 50%;
+}
+
+.drawer-close:hover {
+  background: rgba(var(--c-shade-rgb), 0.25);
 }
 
 .drawer .outline {
   width: 100%;
+  font-size: 0.72em;
+  padding: 1.15em 1.4em;
+}
+
+.drawer .small-note {
+  font-size: 0.8em;
+}
+
+/* Phones: both panels fill the screen. */
+@media (max-width: 600px) {
+  .shade {
+    padding: 0;
+  }
+
+  .drawer,
+  .drawer.is-small,
+  .drawer.is-large {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    border-radius: 0;
+    padding: 20px 18px calc(20px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .drawer {
+    transform: translateY(40px);
+  }
+}
+
+@supports (height: 100dvh) {
+  .drawer.is-large {
+    height: 80dvh;
+  }
+
+  @media (max-width: 1000px) {
+    .drawer.is-large {
+      height: 88dvh;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .drawer,
+    .drawer.is-small,
+    .drawer.is-large {
+      height: 100dvh;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shade,
+  .drawer {
+    transition: none;
+  }
+}
+
+/* Signed-in account view: a tall panel whose content scrolls, instead of squeezing to fit. */
+@media (min-width: 601px) {
+  .drawer.is-small:has(.acct) {
+    height: min(88vh, 960px);
+  }
 }

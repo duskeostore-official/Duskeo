@@ -50,10 +50,6 @@
   font-size: 17px;
 }
 
-.mobile-story-link {
-  display: none;
-}
-
 .header-icon {
   position: relative;
   border: 0;
@@ -123,26 +119,10 @@
     height: 32px;
   }
 
-  .leftnav > .nav {
+  /* Phone: SHOP and the theme switch move into the ☰ menu (MobileMenu). */
+  .leftnav > .nav,
+  .nav.right .theme-toggle {
     display: none;
-  }
-
-  .leftnav.menu-open > .nav {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 18px 22px;
-    position: absolute;
-    top: var(--header-h);
-    left: 10px;
-    right: 10px;
-    padding: 18px;
-    background: var(--c-bg-surface);
-    border: 1px solid var(--c-border-strong);
-    justify-content: space-around;
-  }
-
-  .mobile-story-link {
-    display: inline-flex;
   }
 
   .logo {
@@ -186,7 +166,7 @@
     width: 102px;
   }
 
-  /* Room for 4 icons (theme, search, profile, cart) on small phones */
+  /* Room for the icons (search, profile, cart) on small phones */
   .nav.right {
     gap: 3px;
   }

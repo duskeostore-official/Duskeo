@@ -2,7 +2,8 @@ import { SIZES } from '../../../constants/site'
 import type { Size } from '../../../types'
 
 interface SizeSelectorProps {
-  selected: Size
+  /** null = nothing picked yet */
+  selected: Size | null
   isAvailable: (size: Size) => boolean
   onSelect: (size: Size) => void
 }
