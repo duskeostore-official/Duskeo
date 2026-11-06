@@ -31,6 +31,99 @@
   pointer-events: none;
 }
 
+.story-page-botanical {
+  --botanical-stem: #9a7044;
+  --botanical-leaf: #b29a61;
+  --botanical-bloom: #eee3c8;
+  --botanical-detail: #d6b98a;
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  bottom: 0;
+  width: min(19vw, 260px);
+  min-width: 190px;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.story-page-botanical-left {
+  left: 0;
+}
+
+.story-page-botanical-right {
+  right: 0;
+}
+
+.story-page-botanical svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transform-origin: 50% 50%;
+  animation: story-botanical-sway 8s ease-in-out infinite alternate;
+  filter: drop-shadow(0 0 14px rgba(var(--c-glow-rgb), 0.08));
+}
+
+.story-page-botanical-right svg {
+  transform: scaleX(-1);
+  animation-direction: alternate-reverse;
+}
+
+.story-botanical-stems {
+  stroke: var(--botanical-stem);
+  stroke-width: 1.5;
+  opacity: 0.82;
+}
+
+.story-botanical-leaves {
+  fill: var(--botanical-leaf);
+  stroke: var(--botanical-detail);
+  stroke-width: 0.75;
+  opacity: 0.78;
+}
+
+.story-botanical-bloom {
+  fill: var(--botanical-bloom);
+  stroke: var(--botanical-detail);
+  stroke-width: 0.65;
+  opacity: 0.88;
+}
+
+.story-botanical-bloom circle {
+  fill: var(--botanical-detail);
+  stroke: none;
+}
+
+html[data-theme='light'] .story-page-botanical {
+  --botanical-stem: #8b7563;
+  --botanical-leaf: #a58f62;
+  --botanical-bloom: #d7c7a4;
+  --botanical-detail: #806b51;
+  opacity: 0.42;
+}
+
+html[data-theme='dark'] .story-page-botanical {
+  opacity: 0.58;
+}
+
+.story-page-hero > .story-page-mark,
+.story-page-hero > .story-page-kicker,
+.story-page-hero > h1,
+.story-page-hero > .story-page-intro,
+.story-page-hero > .story-page-scroll {
+  z-index: 1;
+}
+
+@keyframes story-botanical-sway {
+  from {
+    translate: 0 -2px;
+    rotate: -0.35deg;
+  }
+  to {
+    translate: 0 3px;
+    rotate: 0.5deg;
+  }
+}
+
 .story-page-mark,
 .story-page-kicker,
 .story-page-overline,
@@ -245,6 +338,20 @@
     padding: 100px 7% 55px;
   }
 
+  .story-page-botanical {
+    width: 128px;
+    min-width: 0;
+    opacity: 0.34;
+  }
+
+  .story-page-botanical-left {
+    left: -38px;
+  }
+
+  .story-page-botanical-right {
+    right: -38px;
+  }
+
   .story-page-mark {
     top: 25px;
   }
@@ -290,5 +397,11 @@
 
   .story-page-promise {
     padding: 70px 7% 80px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .story-page-botanical svg {
+    animation: none;
   }
 }
