@@ -11,6 +11,7 @@
 --
 --  Carried over from 001/002: auth users, profiles, admins (admin_users -> staff role admin),
 --  restock_requests, products + stock, the product-images bucket and its policies.
+--  The old dashboard-made orders/order_items move to schema "legacy" unchanged.
 --  Run once, on a database that has 001 and 002 applied.
 -- =====================================================================
 
@@ -20,6 +21,25 @@
 create temp table old_products  as select * from public.products;
 create temp table old_inventory as select * from public.inventory;
 create temp table old_admins    as select * from public.admin_users;
+
+-- The first checkout (orders, order_items, place_order(jsonb, jsonb)) was made in the dashboard, not in a
+-- migration. Its rows are kept untouched in schema "legacy" (not exposed by the API); the design's tables replace it.
+create schema if not exists legacy;
+comment on schema legacy is 'Old tables kept for reference after migration 003. Not exposed by the Supabase API.';
+do $$
+begin
+  if to_regclass('public.orders') is not null then
+    drop trigger if exists orders_restore_cancelled_stock on public.orders;
+    drop trigger if exists orders_set_updated_at on public.orders;
+    alter table public.orders set schema legacy;
+  end if;
+  if to_regclass('public.order_items') is not null then
+    alter table public.order_items drop constraint if exists order_items_product_id_fkey;  -- product_id values are kept
+    alter table public.order_items set schema legacy;
+  end if;
+end $$;
+drop function if exists public.restore_cancelled_order_stock();
+drop function if exists public.place_order(jsonb, jsonb);
 
 drop function if exists public.take_inventory(text, text);
 drop table public.inventory;
