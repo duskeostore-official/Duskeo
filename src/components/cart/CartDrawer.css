@@ -140,6 +140,45 @@
   font-size: 1.15em;
 }
 
+.cart-checkout-address {
+  display: grid;
+  gap: 0.45em;
+  margin: 0.9em 0;
+  color: var(--c-muted);
+  font-size: 0.75em;
+  letter-spacing: 0.12em;
+}
+
+.cart-checkout-address select {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid var(--c-border-input);
+  border-radius: var(--radius-sm);
+  background: var(--c-bg-media);
+  color: var(--c-text-strong);
+  padding: 0.75em 0.9em;
+  font: inherit;
+  font-size: 1rem;
+  letter-spacing: normal;
+}
+
+.cart-checkout-address-summary,
+.cart-checkout-error,
+.cart-checkout-message {
+  margin: 0.55em 0;
+  font-size: 0.78em;
+  color: var(--c-muted);
+}
+
+.cart-checkout-error {
+  color: var(--c-danger, #b42318);
+}
+
+.cart-foot button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
 /* Phones: price total moves under the details. */
 @media (max-width: 600px) {
   .cart-line {

@@ -16,6 +16,7 @@ export interface CartContextValue {
   /** Moves a line to another size (merges if that size is already in the bag). */
   changeSize: (name: string, size: Size) => void
   remove: (name: string) => void
+  restore: (items: CartItem[]) => Promise<void>
 }
 
 export const CartContext = createContext<CartContextValue | null>(null)

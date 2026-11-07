@@ -131,7 +131,7 @@ export default function App() {
       </Suspense>
       <Footer />
       <ProductModal />
-      <CartDrawer />
+      <CartDrawer onOpenProfile={() => setProfileOpen(true)} />
       <ProfileDrawer open={profileOpen} onClose={() => setProfileOpen(false)} />
     </>
   )

@@ -183,6 +183,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
     [line, setQty],
   )
 
+  const restore = useCallback(async (nextItems: CartItem[]) => {
+    const previousItems = itemsRef.current
+    const currentUser = userRef.current
+    commit(nextItems)
+    if (!currentUser) return
+
+    await Promise.all(previousItems.map((item) => save(item.product, item.size, 0, currentUser)))
+    await Promise.all(nextItems.map((item) => save(item.product, item.size, item.qty, currentUser)))
+  }, [commit, save])
+
   const value = useMemo(
     () => ({
       items,
@@ -197,8 +207,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
       decrement,
       changeSize,
       remove,
+      restore,
     }),
-    [items, isOpen, canAdd, add, increment, decrement, changeSize, remove],
+    [items, isOpen, canAdd, add, increment, decrement, changeSize, remove, restore],
   )
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>
