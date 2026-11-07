@@ -5,6 +5,7 @@ import { useTheme } from '../../theme/useTheme'
 import { AddressBook } from './AddressBook'
 import { OrderList } from './OrderList'
 import './AccountSections.css'
+import { formatPhoneInput } from '../../utils/phone'
 
 /** How many orders / addresses the panel shows before "view all". */
 const PANEL_ORDERS = 5
@@ -103,13 +104,15 @@ export function AccountSections({ onSignIn, onNavigate }: AccountSectionsProps) 
                 <span className="acct-label">Mobile</span>
                 <input
                   value={profileDraft.phone}
+                  type="tel"
                   onChange={(event) => setProfileDraft((draft) => ({
                     ...draft,
-                    phone: event.target.value.replace(/\D/g, '').slice(0, 10),
+                    phone: formatPhoneInput(event.target.value),
                   }))}
                   autoComplete="tel-national"
-                  inputMode="numeric"
-                  placeholder="10-digit mobile number"
+                  inputMode="tel"
+                  maxLength={16}
+                  placeholder="+259... or 10-digit number"
                 />
               </label>
               <label>

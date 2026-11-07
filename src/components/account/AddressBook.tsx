@@ -3,6 +3,7 @@ import { ROUTES } from '../../constants/routes'
 import { useAccount } from '../../context/account/useAccount'
 import type { Address, AddressType, NewAddress } from '../../context/account/accountContext'
 import { supabase } from '../../lib/supabase'
+import { formatPhoneInput, isValidPhone } from '../../utils/phone'
 
 const INDIAN_STATES = [
   'Andaman and Nicobar Islands',
@@ -172,7 +173,7 @@ export function AddressBook({ limit, onNavigate }: AddressBookProps) {
 
   const saveAddress = async (event: FormEvent) => {
     event.preventDefault()
-    if (!/^[6-9][0-9]{9}$/.test(draft.phone)) return setStatus('Enter a 10-digit mobile number (without +91).')
+    if (!isValidPhone(draft.phone)) return setStatus('Enter a valid mobile number, including the country code when needed.')
     if (!/^[1-9][0-9]{5}$/.test(draft.pincode)) return setStatus('Enter a valid 6-digit PIN code.')
     setBusy(true)
     const clean = { ...draft, line2: draft.line2?.trim() || null, landmark: draft.landmark?.trim() || null }
@@ -228,11 +229,11 @@ export function AddressBook({ limit, onNavigate }: AddressBookProps) {
       <input
         required
         placeholder="Mobile number"
-        inputMode="numeric"
+        type="tel"
         autoComplete="tel-national"
-        maxLength={10}
+        maxLength={16}
         value={draft.phone}
-        onChange={(e) => field('phone')(e.target.value.replace(/\D/g, ''))}
+        onChange={(e) => field('phone')(formatPhoneInput(e.target.value))}
       />
       <input
         required

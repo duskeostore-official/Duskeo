@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { supabase } from '../../lib/supabase'
 import { AccountContext, type Address, type NewAddress, type OrderSummary } from './accountContext'
+import { isValidPhone } from '../../utils/phone'
 
 const ADDRESS_COLUMNS = 'id, name, phone, line1, line2, landmark, city, state, pincode, address_type, is_default'
 const ORDER_COLUMNS = 'id, order_number, status, total_paise, item_count, created_at'
@@ -112,6 +113,7 @@ export function AccountProvider({ children }: { children: ReactNode }) {
   const addAddress = useCallback(
     async (address: NewAddress, makeDefault: boolean) => {
       if (!userId) return { ok: false, error: 'Please sign in first.' }
+      if (!isValidPhone(address.phone)) return { ok: false, error: 'Enter a valid mobile number.' }
       const isDefault = makeDefault || addresses.length === 0
       if (isDefault) {
         const error = await clearDefault()
@@ -127,6 +129,7 @@ export function AccountProvider({ children }: { children: ReactNode }) {
   const updateAddress = useCallback(
     async (id: number, address: NewAddress, makeDefault: boolean) => {
       if (!userId) return { ok: false, error: 'Please sign in first.' }
+      if (!isValidPhone(address.phone)) return { ok: false, error: 'Enter a valid mobile number.' }
       const wasDefault = addresses.find((a) => a.id === id)?.is_default ?? false
       if (makeDefault && !wasDefault) {
         const error = await clearDefault()
@@ -174,8 +177,8 @@ export function AccountProvider({ children }: { children: ReactNode }) {
       if (!userId) return { ok: false, error: 'Please sign in first.' }
       const fullName = profile.fullName.trim()
       if (!fullName) return { ok: false, error: 'Enter your name.' }
-      if (profile.phone && !/^[6-9][0-9]{9}$/.test(profile.phone)) {
-        return { ok: false, error: 'Enter a valid 10-digit mobile number.' }
+      if (profile.phone && !isValidPhone(profile.phone)) {
+        return { ok: false, error: 'Enter a valid mobile number, including the country code when needed.' }
       }
 
       const { error } = await supabase
