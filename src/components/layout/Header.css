@@ -36,6 +36,7 @@
   object-fit: contain;
   display: block;
   margin: auto;
+  filter: var(--c-logo-filter);
 }
 
 .menu-toggle {
