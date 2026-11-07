@@ -2,6 +2,7 @@ import { useEffect, useState, type FormEvent } from 'react'
 import { ROUTES } from '../../constants/routes'
 import { useAccount } from '../../context/account/useAccount'
 import type { Address, AddressType, NewAddress } from '../../context/account/accountContext'
+import { supabase } from '../../lib/supabase'
 
 const INDIAN_STATES = [
   'Andaman and Nicobar Islands',
@@ -84,25 +85,42 @@ export function AddressBook({ limit, onNavigate }: AddressBookProps) {
     const timer = window.setTimeout(async () => {
       setPinLookup('Looking up place and state…')
       try {
+        const { data: savedPin } = await supabase
+          .from('serviceable_pincodes')
+          .select('city, state')
+          .eq('pincode', draft.pincode)
+          .maybeSingle()
+
+        if (savedPin?.state && savedPin?.city) {
+          setDraft((current) => ({
+            ...current,
+            city: savedPin.city,
+            state: INDIAN_STATES.includes(savedPin.state) ? savedPin.state : current.state,
+          }))
+          setPinLookup(`${savedPin.city}, ${savedPin.state}`)
+          return
+        }
+
         const response = await fetch(`https://api.postalpincode.in/pincode/${draft.pincode}`, {
           signal: controller.signal,
         })
         if (!response.ok) throw new Error('Lookup failed')
         const results = (await response.json()) as Array<{
           Status?: string
-          PostOffice?: Array<{ District?: string; State?: string }>
+          PostOffice?: Array<{ Name?: string; District?: string; State?: string }>
         }>
         const postOffice = results[0]?.Status === 'Success' ? results[0].PostOffice?.[0] : undefined
         if (!postOffice?.State) {
           setPinLookup('PIN code not found. Please enter city and state manually.')
           return
         }
+        const place = postOffice.Name || postOffice.District || ''
         setDraft((current) => ({
           ...current,
-          city: postOffice.District || current.city,
+          city: place || current.city,
           state: INDIAN_STATES.includes(postOffice.State) ? postOffice.State : current.state,
         }))
-        setPinLookup(`${postOffice.District ? `${postOffice.District}, ` : ''}${postOffice.State}`)
+        setPinLookup(`${place ? `${place}, ` : ''}${postOffice.State}`)
       } catch (error) {
         if (!(error instanceof DOMException && error.name === 'AbortError')) {
           setPinLookup('Could not look up the PIN code. Please enter manually.')

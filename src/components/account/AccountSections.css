@@ -334,3 +334,18 @@ a.acct-order:hover {
   text-decoration: underline;
   text-underline-offset: 4px;
 }
+
+@media (max-width: 480px) {
+  .acct-form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .acct-form input,
+  .acct-form select {
+    font-size: 16px;
+  }
+
+  .acct-chips {
+    flex-wrap: wrap;
+  }
+}
