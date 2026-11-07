@@ -6,8 +6,10 @@ import { useCart } from '../../context/cart/useCart'
 import type { Product, ProductTheme, Size, Stock } from '../../types'
 import { zeroStock } from '../../utils/inventory'
 import { StorefrontAdmin } from './StorefrontAdmin'
+import { OrdersAdmin } from './OrdersAdmin'
 
 export function InventoryAdmin({ onClose }: { onClose: () => void }) {
+  const [activeSection, setActiveSection] = useState<'inventory' | 'orders'>('inventory')
   const inventory = useInventory()
   const catalog = useCatalog()
   const cart = useCart()
@@ -148,11 +150,31 @@ export function InventoryAdmin({ onClose }: { onClose: () => void }) {
     >
       <div className="inventory-admin-panel">
         <div className="inventory-admin-head">
-          <h2>DUSKEO / INVENTORY CONTROL</h2>
+          <h2>DUSKEO / ADMIN CONTROL</h2>
           <button type="button" aria-label="Close inventory admin" onClick={onClose}>
             ×
           </button>
         </div>
+        <nav className="admin-sections" aria-label="Admin sections">
+          <button
+            type="button"
+            className={activeSection === 'inventory' ? 'active' : ''}
+            aria-pressed={activeSection === 'inventory'}
+            onClick={() => setActiveSection('inventory')}
+          >
+            INVENTORY & STOREFRONT
+          </button>
+          <button
+            type="button"
+            className={activeSection === 'orders' ? 'active' : ''}
+            aria-pressed={activeSection === 'orders'}
+            onClick={() => setActiveSection('orders')}
+          >
+            ORDERS
+          </button>
+        </nav>
+        {activeSection === 'orders' ? <OrdersAdmin /> : (
+          <>
         <p className="admin-warning">
           Set the real available quantity for every product and size. Stock is saved in Supabase and shared across
           all visitors. Access is restricted to authenticated administrator accounts. Initial quantities are set
@@ -263,6 +285,8 @@ export function InventoryAdmin({ onClose }: { onClose: () => void }) {
         <p className="admin-status" aria-live="polite">
           {status}
         </p>
+          </>
+        )}
       </div>
     </div>
   )

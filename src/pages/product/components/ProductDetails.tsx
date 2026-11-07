@@ -28,6 +28,7 @@ export function ProductDetails({ product, showCollectionLink = true }: ProductDe
 
   const qty = inventory.quantity(product.name, size)
   const soldOut = qty < 1
+  const lowStock = qty > 0 && qty < 5
 
   useEffect(() => () => window.clearTimeout(timer.current), [])
 
@@ -61,8 +62,8 @@ export function ProductDetails({ product, showCollectionLink = true }: ProductDe
 
         <SizeSelector selected={size} onSelect={setSize} isAvailable={(s) => inventory.quantity(product.name, s) > 0} />
         <p className="product-size-note">Selected size: {size}</p>
-        <p className="product-stock-status" aria-live="polite">
-          {soldOut ? `SOLD OUT — ${size}` : `${qty} IN STOCK`}
+        <p className={`product-stock-status${lowStock ? ' is-low-stock' : ''}`} aria-live="polite">
+          {soldOut ? `SOLD OUT — ${size}` : lowStock ? `ONLY ${qty} LEFT IN SIZE ${size}` : `${qty} IN STOCK`}
         </p>
 
         <SizeGuide />

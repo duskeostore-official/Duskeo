@@ -97,6 +97,7 @@ export function QuickAddSheet({ product, open, onClose }: QuickAddSheetProps) {
   }
 
   const isAvailable = (s: Size) => !!delivery?.deliverable && delivery.sizes.some((item) => item.size === s)
+  const selectedAvailability = delivery?.sizes.find((item) => item.size === size)?.available
 
   const addToBag = async () => {
     if (!size || !isAvailable(size)) return
@@ -184,6 +185,11 @@ export function QuickAddSheet({ product, open, onClose }: QuickAddSheetProps) {
       {delivery?.deliverable && (
         <>
           <SizeSelector selected={size} isAvailable={isAvailable} onSelect={(s) => isAvailable(s) && setSize(s)} />
+          {selectedAvailability !== undefined && selectedAvailability > 0 && selectedAvailability < 5 && (
+            <p className="quick-add-stock-status" aria-live="polite">
+              ONLY {selectedAvailability} LEFT IN SIZE {size}
+            </p>
+          )}
           {delivery.sizes.length === 0 && (
             <p className="small-note">All sizes are sold out right now. Open the full details to request a restock.</p>
           )}

@@ -87,6 +87,13 @@
   flex-wrap: wrap;
 }
 
+.quick-add-stock-status {
+  color: #b84a3a;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  margin: 10px 0 0;
+}
+
 .quick-add-status {
   min-height: 1.6em;
   font-size: 11px;
