@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { ROUTES } from '../../constants/routes'
 import { useAccount } from '../../context/account/useAccount'
 import type { Address, AddressType, NewAddress } from '../../context/account/accountContext'
@@ -70,8 +70,51 @@ export function AddressBook({ limit, onNavigate }: AddressBookProps) {
   const [makeDefault, setMakeDefault] = useState(true)
   const [status, setStatus] = useState('')
   const [busy, setBusy] = useState(false)
+  const [pinLookup, setPinLookup] = useState('')
 
   const field = (key: keyof NewAddress) => (value: string) => setDraft((d) => ({ ...d, [key]: value }))
+
+  useEffect(() => {
+    if (!/^[1-9][0-9]{5}$/.test(draft.pincode)) {
+      setPinLookup('')
+      return
+    }
+
+    const controller = new AbortController()
+    const timer = window.setTimeout(async () => {
+      setPinLookup('Looking up place and state…')
+      try {
+        const response = await fetch(`https://api.postalpincode.in/pincode/${draft.pincode}`, {
+          signal: controller.signal,
+        })
+        if (!response.ok) throw new Error('Lookup failed')
+        const results = (await response.json()) as Array<{
+          Status?: string
+          PostOffice?: Array<{ District?: string; State?: string }>
+        }>
+        const postOffice = results[0]?.Status === 'Success' ? results[0].PostOffice?.[0] : undefined
+        if (!postOffice?.State) {
+          setPinLookup('PIN code not found. Please enter city and state manually.')
+          return
+        }
+        setDraft((current) => ({
+          ...current,
+          city: postOffice.District || current.city,
+          state: INDIAN_STATES.includes(postOffice.State) ? postOffice.State : current.state,
+        }))
+        setPinLookup(`${postOffice.District ? `${postOffice.District}, ` : ''}${postOffice.State}`)
+      } catch (error) {
+        if (!(error instanceof DOMException && error.name === 'AbortError')) {
+          setPinLookup('Could not look up the PIN code. Please enter manually.')
+        }
+      }
+    }, 400)
+
+    return () => {
+      window.clearTimeout(timer)
+      controller.abort()
+    }
+  }, [draft.pincode])
 
   const saveAddress = async (event: FormEvent) => {
     event.preventDefault()
@@ -154,7 +197,7 @@ export function AddressBook({ limit, onNavigate }: AddressBookProps) {
       <div className="acct-form-row">
         <input
           required
-          placeholder="City"
+          placeholder="City / district"
           autoComplete="address-level2"
           value={draft.city}
           onChange={(e) => field('city')(e.target.value)}
@@ -169,6 +212,11 @@ export function AddressBook({ limit, onNavigate }: AddressBookProps) {
           onChange={(e) => field('pincode')(e.target.value.replace(/\D/g, ''))}
         />
       </div>
+      {pinLookup && (
+        <span className="acct-label" role="status">
+          {pinLookup}
+        </span>
+      )}
       <select required value={draft.state} onChange={(e) => field('state')(e.target.value)}>
         <option value="" disabled>
           State
