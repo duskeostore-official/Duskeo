@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react'
-import logo from '../../assets/images/brand/logo.webp'
+import logo from '../../assets/images/brand/new-logo.webp'
 import { ROUTES } from '../../constants/routes'
 import { SHOW_THEME_TOGGLE } from '../../constants/theme'
 import { useCart } from '../../context/cart/useCart'
@@ -30,7 +30,7 @@ export function Header({ onOpenProfile }: HeaderProps) {
       <MobileMenu open={menuOpen} onClose={closeMenu} onOpenProfile={onOpenProfile} />
 
       <a aria-label="DUSKEO home" href={ROUTES.top}>
-        <img className="logo" src={logo} alt="DUSKEO official logo" />
+        <img className="logo" src={logo} alt="DUSKEO official logo" fetchPriority="high" decoding="async" />
       </a>
 
       <nav className="nav right">

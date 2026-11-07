@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { AdminGate } from './components/admin/AdminGate'
 import { CartDrawer } from './components/cart/CartDrawer'
 import { Footer } from './components/layout/Footer'
@@ -11,16 +11,17 @@ import { DEFAULT_TITLE, titleFor } from './constants/site'
 import { useCatalog } from './context/catalog/useCatalog'
 import { POLICIES } from './data/policies'
 import { useHashRoute } from './hooks/useHashRoute'
-import { AddressesPage } from './pages/account/AddressesPage'
-import { OrderDetailPage } from './pages/account/OrderDetailPage'
-import { OrdersPage } from './pages/account/OrdersPage'
-import { FaqPage } from './pages/faq/FaqPage'
 import { HomePage } from './pages/home/HomePage'
-import { PoliciesPage } from './pages/policies/PoliciesPage'
-import { ProductPage } from './pages/product/ProductPage'
-import { SearchPage } from './pages/search/SearchPage'
-import { StoryPage } from './pages/story/StoryPage'
 import type { Product, Route } from './types'
+
+const AddressesPage = lazy(() => import('./pages/account/AddressesPage').then((module) => ({ default: module.AddressesPage })))
+const OrderDetailPage = lazy(() => import('./pages/account/OrderDetailPage').then((module) => ({ default: module.OrderDetailPage })))
+const OrdersPage = lazy(() => import('./pages/account/OrdersPage').then((module) => ({ default: module.OrdersPage })))
+const FaqPage = lazy(() => import('./pages/faq/FaqPage').then((module) => ({ default: module.FaqPage })))
+const PoliciesPage = lazy(() => import('./pages/policies/PoliciesPage').then((module) => ({ default: module.PoliciesPage })))
+const ProductPage = lazy(() => import('./pages/product/ProductPage').then((module) => ({ default: module.ProductPage })))
+const SearchPage = lazy(() => import('./pages/search/SearchPage').then((module) => ({ default: module.SearchPage })))
+const StoryPage = lazy(() => import('./pages/story/StoryPage').then((module) => ({ default: module.StoryPage })))
 
 function pageTitle(route: Route, findProduct: (slug: string) => { name: string } | undefined) {
   switch (route.view) {
@@ -120,7 +121,9 @@ export default function App() {
     <>
       <LogoFilters />
       <Header onOpenProfile={() => setProfileOpen(true)} />
-      <CurrentPage route={route} findProduct={catalog.findProduct} onOpenProfile={() => setProfileOpen(true)} />
+      <Suspense fallback={<main className="page-loading" aria-label="Loading page" />}>
+        <CurrentPage route={route} findProduct={catalog.findProduct} onOpenProfile={() => setProfileOpen(true)} />
+      </Suspense>
       <Footer />
       <ProductModal />
       <CartDrawer />

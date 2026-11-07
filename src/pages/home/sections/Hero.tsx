@@ -23,7 +23,7 @@ export function Hero() {
         </div>
       </div>
       <div className="hero-art">
-        <img src={heroImage} alt="DUSKEO campaign model beside glowing ivory spire" />
+        <img src={heroImage} alt="DUSKEO campaign model beside glowing ivory spire" fetchPriority="high" decoding="async" />
       </div>
     </section>
   )

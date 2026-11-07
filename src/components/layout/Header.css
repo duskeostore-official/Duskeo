@@ -1,7 +1,7 @@
 .header {
   height: var(--header-h);
   display: grid;
-  grid-template-columns: 1fr 220px 1fr;
+  grid-template-columns: 1fr 240px 1fr;
   align-items: center;
   padding: 0 4.5%;
   border-bottom: 1px solid var(--c-border-header);
@@ -31,13 +31,11 @@
 }
 
 .logo {
-  width: 210px;
-  height: 94px;
+  width: 220px;
+  height: 96px;
   object-fit: contain;
   display: block;
   margin: auto;
-  /* Set per theme in constants/theme.ts (pitch black in light mode) */
-  filter: var(--c-logo-filter);
 }
 
 .menu-toggle {
@@ -104,12 +102,14 @@
 
 @media (max-width: 700px) {
   .header {
-    grid-template-columns: 1fr 110px 1fr;
+    grid-template-columns: 1fr 175px 1fr;
     padding: 0 12px;
+    align-items: center;
   }
 
   .leftnav {
     gap: 8px;
+    justify-self: start;
   }
 
   .menu-toggle {
@@ -125,9 +125,18 @@
     display: none;
   }
 
+  .header > a[aria-label="DUSKEO home"] {
+    width: 175px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    justify-self: center;
+  }
+
   .logo {
-    width: 110px;
-    height: 70px;
+    width: 118px;
+    height: 48px;
   }
 
   .nav {
@@ -138,6 +147,8 @@
 
   .nav.right {
     gap: 7px;
+    justify-self: end;
+    align-items: center;
   }
 
   .header-icon {
@@ -162,8 +173,21 @@
 }
 
 @media (max-width: 390px) {
+  .header {
+    grid-template-columns: 1fr 160px 1fr;
+  }
+
+  .header > a[aria-label="DUSKEO home"] {
+    width: 160px;
+  }
+
   .logo {
-    width: 102px;
+    width: 118px;
+    height: 48px;
+  }
+
+  .header > a[aria-label="DUSKEO home"] {
+    width: 118px;
   }
 
   /* Room for the icons (search, profile, cart) on small phones */

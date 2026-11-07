@@ -122,6 +122,15 @@ export function useInfiniteRail({ speed, direction, phase = 0 }: RailOptions) {
     let last = performance.now()
 
     const tick = (now: number) => {
+      const viewport = viewportRef.current
+      const rect = viewport?.getBoundingClientRect()
+      const inViewport = !!rect && rect.bottom >= 0 && rect.top <= window.innerHeight
+      if (document.hidden || !inViewport) {
+        last = now
+        raf = requestAnimationFrame(tick)
+        return
+      }
+
       const dt = Math.min(0.05, (now - last) / 1000)
       last = now
       const st = s.current
