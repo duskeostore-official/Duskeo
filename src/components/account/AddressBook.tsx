@@ -55,6 +55,9 @@ const EMPTY_ADDRESS: NewAddress = {
   address_type: 'home',
 }
 
+const addressTypeLabel = (type: AddressType) =>
+  type === 'work' ? 'OFFICE' : type.toUpperCase()
+
 const normalizePlace = (place: string | null | undefined) => {
   if (!place) return ''
   const normalized = place.trim()
@@ -288,7 +291,7 @@ export function AddressBook({ limit, onNavigate }: AddressBookProps) {
             className={draft.address_type === type ? 'active' : ''}
             onClick={() => setDraft((d) => ({ ...d, address_type: type }))}
           >
-            {type.toUpperCase()}
+            {addressTypeLabel(type)}
           </button>
         ))}
       </div>
@@ -327,7 +330,9 @@ export function AddressBook({ limit, onNavigate }: AddressBookProps) {
             <div className="acct-address-top">
               <strong>{address.name}</strong>
               <span className="acct-badge">
-                {address.is_default ? 'DEFAULT' : address.address_type.toUpperCase()}
+                {address.is_default
+                  ? `DEFAULT · ${addressTypeLabel(address.address_type)}`
+                  : addressTypeLabel(address.address_type)}
               </span>
             </div>
             <p>
