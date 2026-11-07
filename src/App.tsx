@@ -80,12 +80,20 @@ function CurrentPage({
 
 export default function App() {
   const catalog = useCatalog()
-  const { hash, route, clearHash } = useHashRoute(catalog.products)
+  const { hash, route } = useHashRoute(catalog.products)
   const [profileOpen, setProfileOpen] = useState(false)
   const anchor = route.view === 'home' ? route.anchor : undefined
+  const isAdminPath =
+    window.location.pathname === '/admin' ||
+    window.location.pathname === '/admin/' ||
+    hash.toLowerCase() === ROUTES.admin
 
   // Title + scroll position whenever the route changes.
   useEffect(() => {
+    if (isAdminPath) {
+      document.title = titleFor('Admin')
+      return
+    }
     document.title = pageTitle(route, catalog.findProduct)
     if (anchor) {
       // The home view may have just mounted, so scroll after it renders.
@@ -93,7 +101,20 @@ export default function App() {
     } else {
       window.scrollTo({ top: 0, behavior: 'instant' })
     }
-  }, [route, anchor, catalog.findProduct])
+  }, [route, anchor, catalog.findProduct, isAdminPath])
+
+  const closeAdmin = () => {
+    window.location.assign('/')
+  }
+
+  if (isAdminPath) {
+    return (
+      <>
+        <LogoFilters />
+        <AdminGate onClose={closeAdmin} />
+      </>
+    )
+  }
 
   return (
     <>
@@ -104,7 +125,6 @@ export default function App() {
       <ProductModal />
       <CartDrawer />
       <ProfileDrawer open={profileOpen} onClose={() => setProfileOpen(false)} />
-      {hash.toLowerCase() === ROUTES.admin && <AdminGate onClose={clearHash} />}
     </>
   )
 }

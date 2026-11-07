@@ -5,8 +5,8 @@ import { supabase } from '../../lib/supabase'
 import './Admin.css'
 
 /**
- * Private route: open the site with #admin. No public link is shown.
- * Mount only while the route is active so each visit starts at the login step.
+ * Private route: mounted only on the dedicated /admin screen.
+ * The Supabase is_admin RPC is the real authorization guard.
  */
 export function AdminGate({ onClose }: { onClose: () => void }) {
   const [signedIn, setSignedIn] = useState(false)

@@ -7,7 +7,6 @@ const POLICY_LINKS = [
   { href: '#policy-returns', label: 'RETURNS & EXCHANGES' },
   { href: '#policy-privacy', label: 'PRIVACY' },
   { href: '#policy-terms', label: 'TERMS' },
-  { href: '#admin', label: 'ADMIN LOGIN' },
 ]
 
 export function Footer() {
