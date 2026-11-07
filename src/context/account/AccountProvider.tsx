@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { supabase } from '../../lib/supabase'
 import { AccountContext, type Address, type NewAddress, type OrderSummary } from './accountContext'
 
@@ -15,11 +15,16 @@ export function AccountProvider({ children }: { children: ReactNode }) {
   const [addresses, setAddresses] = useState<Address[]>([])
   const [orders, setOrders] = useState<OrderSummary[]>([])
   const [loading, setLoading] = useState(false)
+  const currentUserId = useRef<string | null>(null)
 
   useEffect(() => {
     // supabase-js: don't call Supabase inside this callback; the effect below does the work.
     const { data } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUserId(session?.user.id ?? null)
+      const nextUserId = session?.user.id ?? null
+      currentUserId.current = nextUserId
+      setAddresses([])
+      setOrders([])
+      setUserId(nextUserId)
       setAuthEmail(session?.user.email ?? '')
       setReady(true)
     })
@@ -27,13 +32,20 @@ export function AccountProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const loadAddresses = useCallback(async () => {
+    if (!userId) {
+      setAddresses([])
+      return
+    }
     const { data } = await supabase
       .from('addresses')
       .select(ADDRESS_COLUMNS)
+      .eq('user_id', userId)
       .order('is_default', { ascending: false })
       .order('created_at', { ascending: false }) // default first, then newest
-    setAddresses((data as Address[] | null) ?? [])
-  }, [])
+    if (currentUserId.current === userId) {
+      setAddresses((data as Address[] | null) ?? [])
+    }
+  }, [userId])
 
   useEffect(() => {
     if (!userId) {
@@ -89,6 +101,7 @@ export function AccountProvider({ children }: { children: ReactNode }) {
 
   const updateAddress = useCallback(
     async (id: number, address: NewAddress, makeDefault: boolean) => {
+      if (!userId) return { ok: false, error: 'Please sign in first.' }
       const wasDefault = addresses.find((a) => a.id === id)?.is_default ?? false
       if (makeDefault && !wasDefault) {
         const error = await clearDefault()
@@ -98,29 +111,32 @@ export function AccountProvider({ children }: { children: ReactNode }) {
         .from('addresses')
         .update({ ...address, is_default: makeDefault || wasDefault })
         .eq('id', id)
+        .eq('user_id', userId)
       await loadAddresses()
       return error ? { ok: false, error: error.message } : { ok: true }
     },
-    [addresses, clearDefault, loadAddresses],
+    [addresses, clearDefault, loadAddresses, userId],
   )
 
   const setDefaultAddress = useCallback(
     async (id: number) => {
+      if (!userId) return { ok: false, error: 'Please sign in first.' }
       const cleared = await clearDefault()
-      const { error } = cleared ? { error: cleared } : await supabase.from('addresses').update({ is_default: true }).eq('id', id)
+      const { error } = cleared ? { error: cleared } : await supabase.from('addresses').update({ is_default: true }).eq('id', id).eq('user_id', userId)
       await loadAddresses()
       return error ? { ok: false, error: error.message } : { ok: true }
     },
-    [clearDefault, loadAddresses],
+    [clearDefault, loadAddresses, userId],
   )
 
   const deleteAddress = useCallback(
     async (id: number) => {
-      const { error } = await supabase.from('addresses').delete().eq('id', id)
+      if (!userId) return { ok: false, error: 'Please sign in first.' }
+      const { error } = await supabase.from('addresses').delete().eq('id', id).eq('user_id', userId)
       await loadAddresses()
       return error ? { ok: false, error: error.message } : { ok: true }
     },
-    [loadAddresses],
+    [loadAddresses, userId],
   )
 
   const value = useMemo(
