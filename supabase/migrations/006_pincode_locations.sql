@@ -35,3 +35,17 @@ with check (true);
 
 grant select on public.pincode_locations to anon, authenticated;
 grant insert, update on public.pincode_locations to authenticated;
+
+-- Prefer district/city over the first post-office name. Correct previously
+-- cached Bangalore values without changing the separate delivery coverage.
+update public.pincode_locations
+set place = case
+      when district is not null and btrim(district) <> '' then
+        case when btrim(district) = 'Bangalore' then 'Bengaluru' else btrim(district) end
+      when btrim(place) = 'Bangalore' then 'Bengaluru'
+      else place
+    end,
+    district = case when btrim(coalesce(district, '')) = 'Bangalore' then 'Bengaluru' else district end,
+    updated_at = now()
+where district is not null
+   or btrim(place) in ('Bangalore', 'Dharmaram College');

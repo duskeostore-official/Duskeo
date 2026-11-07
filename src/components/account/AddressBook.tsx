@@ -55,6 +55,13 @@ const EMPTY_ADDRESS: NewAddress = {
   address_type: 'home',
 }
 
+const normalizePlace = (place: string | null | undefined) => {
+  if (!place) return ''
+  const normalized = place.trim()
+  if (normalized === 'Bangalore') return 'Bengaluru'
+  return normalized
+}
+
 interface AddressBookProps {
   /** Show only the default + newest addresses up to this many, with a "view all" link for the rest. */
   limit?: number
@@ -92,12 +99,13 @@ export function AddressBook({ limit, onNavigate }: AddressBookProps) {
           .maybeSingle()
 
         if (location?.state && location?.place) {
+          const place = normalizePlace(location.district || location.place)
           setDraft((current) => ({
             ...current,
-            city: location.place,
+            city: place || current.city,
             state: INDIAN_STATES.includes(location.state) ? location.state : current.state,
           }))
-          setPinLookup(`${location.place}, ${location.state}`)
+          setPinLookup(`${place}, ${location.state}`)
           return
         }
 
@@ -130,7 +138,7 @@ export function AddressBook({ limit, onNavigate }: AddressBookProps) {
           setPinLookup('PIN code not found. Please enter city and state manually.')
           return
         }
-        const place = postOffice.Name || postOffice.District || ''
+        const place = normalizePlace(postOffice.District || postOffice.Name)
         setDraft((current) => ({
           ...current,
           city: place || current.city,
