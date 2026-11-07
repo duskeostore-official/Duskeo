@@ -1,0 +1,21 @@
+.campaign-page-hero {
+  min-height: calc(100vh - 96px);
+  display: flex;
+  align-items: center;
+  padding: 5vw;
+  background-color: var(--c-bg);
+  background-size: cover;
+  background-position: center;
+}
+
+.campaign-page-hero > div {
+  width: min(620px, 100%);
+  padding: 28px;
+  background: rgba(0, 0, 0, 0.72);
+  color: #fff;
+}
+
+.campaign-page-hero h1 {
+  margin: 12px 0;
+  font-size: clamp(36px, 6vw, 72px);
+}

@@ -5,6 +5,7 @@ import { useCatalog } from '../../context/catalog/useCatalog'
 import { useCart } from '../../context/cart/useCart'
 import type { Product, ProductTheme, Size, Stock } from '../../types'
 import { zeroStock } from '../../utils/inventory'
+import { StorefrontAdmin } from './StorefrontAdmin'
 
 export function InventoryAdmin({ onClose }: { onClose: () => void }) {
   const inventory = useInventory()
@@ -157,6 +158,7 @@ export function InventoryAdmin({ onClose }: { onClose: () => void }) {
           all visitors. Access is restricted to authenticated administrator accounts. Initial quantities are set
           to zero until you enter inventory.
         </p>
+        <StorefrontAdmin setStatus={setStatus} />
         <section className="product-admin-form" aria-labelledby="upload-product-heading">
           <h3 id="upload-product-heading">ADD PRODUCT</h3>
           <div className="product-admin-fields">

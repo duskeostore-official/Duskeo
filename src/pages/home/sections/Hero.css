@@ -89,6 +89,7 @@
   z-index: -1;
   overflow: hidden;
   background: var(--c-bg-elevated);
+  border-radius: 0;
 }
 
 .hero-art::after {

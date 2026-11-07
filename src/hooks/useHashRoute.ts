@@ -28,6 +28,9 @@ export function parseRoute(hash: string, products: Product[] = []): Route {
     const slug = lower.slice('#product-'.length)
     if (products.length ? products.some((product) => product.slug === slug) : findProduct(slug)) return { view: 'product', slug }
   }
+  if (lower.startsWith('#campaign-')) {
+    return { view: 'campaign', slug: lower.slice('#campaign-'.length) }
+  }
   if (lower.startsWith(ROUTES.policyPrefix)) {
     const id = lower.slice(1)
     return { view: 'policy', policyId: POLICIES.some((p) => p.id === id) ? id : POLICIES[0].id }

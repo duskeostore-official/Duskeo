@@ -15,6 +15,7 @@ import { HomePage } from './pages/home/HomePage'
 import type { Product, Route } from './types'
 
 const AddressesPage = lazy(() => import('./pages/account/AddressesPage').then((module) => ({ default: module.AddressesPage })))
+const CampaignPage = lazy(() => import('./pages/campaign/CampaignPage').then((module) => ({ default: module.CampaignPage })))
 const OrderDetailPage = lazy(() => import('./pages/account/OrderDetailPage').then((module) => ({ default: module.OrderDetailPage })))
 const OrdersPage = lazy(() => import('./pages/account/OrdersPage').then((module) => ({ default: module.OrdersPage })))
 const FaqPage = lazy(() => import('./pages/faq/FaqPage').then((module) => ({ default: module.FaqPage })))
@@ -42,6 +43,8 @@ function pageTitle(route: Route, findProduct: (slug: string) => { name: string }
       return titleFor(findProduct(route.slug)!.name)
     case 'policy':
       return titleFor(POLICIES.find((p) => p.id === route.policyId)?.navLabel ?? 'Policies')
+    case 'campaign':
+      return titleFor('Campaign')
     default:
       return DEFAULT_TITLE
   }
@@ -74,6 +77,8 @@ function CurrentPage({
       return <ProductPage key={route.slug} product={findProduct(route.slug)!} />
     case 'policy':
       return <PoliciesPage policyId={route.policyId} />
+    case 'campaign':
+      return <CampaignPage slug={route.slug} />
     default:
       return <HomePage />
   }
