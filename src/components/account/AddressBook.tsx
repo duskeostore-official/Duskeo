@@ -85,6 +85,22 @@ export function AddressBook({ limit, onNavigate }: AddressBookProps) {
     const timer = window.setTimeout(async () => {
       setPinLookup('Looking up place and state…')
       try {
+        const { data: location } = await supabase
+          .from('pincode_locations')
+          .select('place, district, state')
+          .eq('pincode', draft.pincode)
+          .maybeSingle()
+
+        if (location?.state && location?.place) {
+          setDraft((current) => ({
+            ...current,
+            city: location.place,
+            state: INDIAN_STATES.includes(location.state) ? location.state : current.state,
+          }))
+          setPinLookup(`${location.place}, ${location.state}`)
+          return
+        }
+
         const { data: savedPin } = await supabase
           .from('serviceable_pincodes')
           .select('city, state')
@@ -121,6 +137,15 @@ export function AddressBook({ limit, onNavigate }: AddressBookProps) {
           state: INDIAN_STATES.includes(postOffice.State) ? postOffice.State : current.state,
         }))
         setPinLookup(`${place ? `${place}, ` : ''}${postOffice.State}`)
+        if (place && postOffice.State) {
+          await supabase.from('pincode_locations').upsert({
+            pincode: draft.pincode,
+            place,
+            district: postOffice.District ?? null,
+            state: postOffice.State,
+            updated_at: new Date().toISOString(),
+          })
+        }
       } catch (error) {
         if (!(error instanceof DOMException && error.name === 'AbortError')) {
           setPinLookup('Could not look up the PIN code. Please enter manually.')
