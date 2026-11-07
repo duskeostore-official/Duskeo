@@ -36,11 +36,20 @@ export interface AccountContextValue {
   ready: boolean
   name: string
   email: string
+  phone: string
+  gender: '' | 'male' | 'female' | 'other'
+  dateOfBirth: string
   addresses: Address[]
   /** The address whose PIN code the size picker uses. */
   defaultAddress: Address | null
   orders: OrderSummary[]
   loading: boolean
+  updateProfile: (profile: {
+    fullName: string
+    phone: string
+    gender: '' | 'male' | 'female' | 'other'
+    dateOfBirth: string
+  }) => Promise<{ ok: boolean; error?: string }>
   addAddress: (address: NewAddress, makeDefault: boolean) => Promise<{ ok: boolean; error?: string }>
   updateAddress: (id: number, address: NewAddress, makeDefault: boolean) => Promise<{ ok: boolean; error?: string }>
   setDefaultAddress: (id: number) => Promise<{ ok: boolean; error?: string }>

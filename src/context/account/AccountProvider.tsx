@@ -12,6 +12,9 @@ export function AccountProvider({ children }: { children: ReactNode }) {
   const [authEmail, setAuthEmail] = useState('')
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
+  const [phone, setPhone] = useState('')
+  const [gender, setGender] = useState<'' | 'male' | 'female' | 'other'>('')
+  const [dateOfBirth, setDateOfBirth] = useState('')
   const [addresses, setAddresses] = useState<Address[]>([])
   const [orders, setOrders] = useState<OrderSummary[]>([])
   const [loading, setLoading] = useState(false)
@@ -52,6 +55,9 @@ export function AccountProvider({ children }: { children: ReactNode }) {
       const clear = window.setTimeout(() => {
         setName('')
         setEmail('')
+        setPhone('')
+        setGender('')
+        setDateOfBirth('')
         setAddresses([])
         setOrders([])
       }, 0)
@@ -61,13 +67,16 @@ export function AccountProvider({ children }: { children: ReactNode }) {
     const load = window.setTimeout(async () => {
       setLoading(true)
       const [profile, , orderRows] = await Promise.all([
-        supabase.from('profiles').select('full_name, email').eq('id', userId).maybeSingle(),
+        supabase.from('profiles').select('full_name, email, phone, gender, date_of_birth').eq('id', userId).maybeSingle(),
         loadAddresses(),
         supabase.from('orders').select(ORDER_COLUMNS).order('created_at', { ascending: false }).limit(100),
       ])
       if (cancelled) return
       setName(profile.data?.full_name ?? '')
       setEmail(profile.data?.email ?? authEmail)
+      setPhone(profile.data?.phone ?? '')
+      setGender(profile.data?.gender ?? '')
+      setDateOfBirth(profile.data?.date_of_birth ?? '')
       setOrders((orderRows.data as OrderSummary[] | null) ?? [])
       setLoading(false)
     }, 0)
@@ -139,22 +148,61 @@ export function AccountProvider({ children }: { children: ReactNode }) {
     [loadAddresses, userId],
   )
 
+  const updateProfile = useCallback(
+    async (profile: {
+      fullName: string
+      phone: string
+      gender: '' | 'male' | 'female' | 'other'
+      dateOfBirth: string
+    }) => {
+      if (!userId) return { ok: false, error: 'Please sign in first.' }
+      const fullName = profile.fullName.trim()
+      if (!fullName) return { ok: false, error: 'Enter your name.' }
+      if (profile.phone && !/^[6-9][0-9]{9}$/.test(profile.phone)) {
+        return { ok: false, error: 'Enter a valid 10-digit mobile number.' }
+      }
+
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          full_name: fullName,
+          phone: profile.phone || null,
+          gender: profile.gender || null,
+          date_of_birth: profile.dateOfBirth || null,
+        })
+        .eq('id', userId)
+      if (error) return { ok: false, error: error.message }
+
+      await supabase.auth.updateUser({ data: { full_name: fullName } })
+      setName(fullName)
+      setPhone(profile.phone)
+      setGender(profile.gender)
+      setDateOfBirth(profile.dateOfBirth)
+      return { ok: true }
+    },
+    [userId],
+  )
+
   const value = useMemo(
     () => ({
       userId,
       ready,
       name,
       email,
+      phone,
+      gender,
+      dateOfBirth,
       addresses,
       defaultAddress: addresses.find((a) => a.is_default) ?? null,
       orders,
       loading,
+      updateProfile,
       addAddress,
       updateAddress,
       setDefaultAddress,
       deleteAddress,
     }),
-    [userId, ready, name, email, addresses, orders, loading, addAddress, updateAddress, setDefaultAddress, deleteAddress],
+    [userId, ready, name, email, phone, gender, dateOfBirth, addresses, orders, loading, updateProfile, addAddress, updateAddress, setDefaultAddress, deleteAddress],
   )
 
   return <AccountContext.Provider value={value}>{children}</AccountContext.Provider>

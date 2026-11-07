@@ -275,6 +275,29 @@
   width: 100%;
 }
 
+.acct-profile-edit {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.acct-profile-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.acct-profile-actions {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.acct-profile-actions .outline {
+  width: 100%;
+}
+
 /* ---------- Inside the profile pop-up (larger screens): roomier, scrolls inside the panel ---------- */
 .drawer .acct {
   padding-right: 0.4em; /* keeps cards clear of the scrollbar */
