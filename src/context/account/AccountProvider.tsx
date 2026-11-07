@@ -39,15 +39,31 @@ export function AccountProvider({ children }: { children: ReactNode }) {
       setAddresses([])
       return
     }
-    const { data } = await supabase
-      .from('addresses')
-      .select(ADDRESS_COLUMNS)
-      .eq('user_id', userId)
-      .order('is_default', { ascending: false })
-      .order('created_at', { ascending: false }) // default first, then newest
-    if (currentUserId.current === userId) {
-      setAddresses((data as Address[] | null) ?? [])
+    let lastError: { message: string } | null = null
+
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const { data, error } = await supabase
+        .from('addresses')
+        .select(ADDRESS_COLUMNS)
+        .eq('user_id', userId)
+        .order('is_default', { ascending: false })
+        .order('created_at', { ascending: false }) // default first, then newest
+
+      if (!error) {
+        if (currentUserId.current === userId) {
+          setAddresses((data as Address[] | null) ?? [])
+        }
+        return { ok: true as const }
+      }
+
+      lastError = error
+      if (attempt === 0) {
+        await new Promise((resolve) => window.setTimeout(resolve, 300))
+      }
     }
+
+    // A temporary network/RLS query failure must not erase data already in memory.
+    return { ok: false as const, error: lastError?.message || 'Could not load saved addresses.' }
   }, [userId])
 
   useEffect(() => {
