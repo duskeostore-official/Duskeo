@@ -16,6 +16,7 @@ export const ROUTES = {
   orders: '#orders',
   orderPrefix: '#order-',
   addresses: '#addresses',
+  collectionPrefix: '#collection-',
 } as const
 
 export const orderHref = (id: number) => `${ROUTES.orderPrefix}${id}`

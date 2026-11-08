@@ -307,6 +307,7 @@
 }
 
 .mood {
+  text-decoration: none;
   position: relative;
   isolation: isolate;
   overflow: hidden;
@@ -349,15 +350,6 @@
   background: linear-gradient(0deg, rgba(var(--c-shade-rgb), 0.82), rgba(var(--c-shade-rgb), 0.05) 75%);
 }
 
-.mood-symbol {
-  position: absolute;
-  top: 14px;
-  right: 18px;
-  font-size: 22px;
-  opacity: 0.75;
-  transition: transform 0.9s var(--ease-apple);
-}
-
 .mood-text strong {
   display: block;
   font-size: clamp(14px, 1.5vw, 19px);
@@ -380,23 +372,12 @@
   opacity: 0.8;
 }
 
-.mood.is-on {
-  border-color: var(--c-text-on-image);
-}
-
-.mood.is-on img {
-  filter: grayscale(0) brightness(0.62);
-}
-
 @media (hover: hover) {
   .mood:hover img {
     filter: grayscale(0) brightness(0.62);
     transform: scale(1.12);
   }
 
-  .mood:hover .mood-symbol {
-    transform: rotate(90deg) scale(1.15);
-  }
 }
 
 /* ---------- Layout ---------- */

@@ -116,20 +116,32 @@ export function useInfiniteRail({ speed, direction, phase = 0 }: RailOptions) {
 
   // Animation loop.
   useEffect(() => {
+    const viewport = viewportRef.current
+    if (!viewport) return
+
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
     const stepQuery = window.matchMedia(RAIL_STEP_QUERY)
     let raf = 0
     let last = performance.now()
+    let inViewport = false
+    let pageVisible = !document.hidden
+
+    const schedule = () => {
+      if (!raf && inViewport && pageVisible) {
+        last = performance.now()
+        raf = requestAnimationFrame(tick)
+      }
+    }
+
+    const stop = () => {
+      if (!raf) return
+      cancelAnimationFrame(raf)
+      raf = 0
+    }
 
     const tick = (now: number) => {
-      const viewport = viewportRef.current
-      const rect = viewport?.getBoundingClientRect()
-      const inViewport = !!rect && rect.bottom >= 0 && rect.top <= window.innerHeight
-      if (document.hidden || !inViewport) {
-        last = now
-        raf = requestAnimationFrame(tick)
-        return
-      }
+      raf = 0
+      if (!inViewport || !pageVisible) return
 
       const dt = Math.min(0.05, (now - last) / 1000)
       last = now
@@ -164,11 +176,35 @@ export function useInfiniteRail({ speed, direction, phase = 0 }: RailOptions) {
         }
         apply()
       }
-      raf = requestAnimationFrame(tick)
+      schedule()
     }
 
-    raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
+    const observer = typeof IntersectionObserver === 'undefined'
+      ? null
+      : new IntersectionObserver(([entry]) => {
+          inViewport = entry.isIntersecting
+          if (inViewport) schedule()
+          else stop()
+        })
+    if (observer) {
+      observer.observe(viewport)
+    } else {
+      inViewport = true
+      schedule()
+    }
+
+    const onVisibilityChange = () => {
+      pageVisible = !document.hidden
+      if (pageVisible) schedule()
+      else stop()
+    }
+    document.addEventListener('visibilitychange', onVisibilityChange)
+
+    return () => {
+      observer?.disconnect()
+      document.removeEventListener('visibilitychange', onVisibilityChange)
+      stop()
+    }
   }, [speed, direction, phase, apply, tweenTo])
 
   // Horizontal trackpad / shift+wheel scrolling in drift mode

@@ -35,7 +35,15 @@ export function ProductCard({ product, onOpen, focusable = true }: ProductCardPr
         tabIndex={tabIndex}
         onClick={open}
       >
-        <img className="product-photo" src={product.photos[0].src} alt={product.cardAlt} draggable={false} loading="lazy" />
+        <img
+          className="product-photo"
+          src={product.photos[0].src}
+          alt={product.cardAlt}
+          draggable={false}
+          loading="lazy"
+          decoding="async"
+          fetchPriority="low"
+        />
       </a>
       <a className="product-name product-open-name" href={href} draggable={false} tabIndex={tabIndex} onClick={open}>
         {product.name}

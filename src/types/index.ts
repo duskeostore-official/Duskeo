@@ -92,3 +92,4 @@ export type Route =
   | { view: 'orders' }
   | { view: 'order'; orderId: number }
   | { view: 'addresses' }
+  | { view: 'collection'; slug: string }

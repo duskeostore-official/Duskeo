@@ -1,46 +1,25 @@
-import { useCatalog } from '../../../context/catalog/useCatalog'
-import { PRODUCT_THEMES, THEME_MOODS } from '../../../data/searchConfig'
-import type { Product, ProductTheme } from '../../../types'
+import { CAMPAIGN_COLLECTIONS, collectionHref } from '../../../data/campaignCollections'
 
-interface ThemeMoodsProps {
-  selected: ProductTheme[]
-  onToggle: (theme: ProductTheme) => void
-  /** Products matching the text query — for the counts. */
-  pool: Product[]
-}
-
-/** "Shop by mood" — large image tiles that double as theme filters. */
-export function ThemeMoods({ selected, onToggle, pool }: ThemeMoodsProps) {
-  const catalog = useCatalog()
+/** Collection links styled like the existing image-based mood tiles. */
+export function ThemeMoods() {
   return (
-    <section className="moods" aria-label="Shop by mood">
+    <section className="moods" aria-label="Shop by collection">
       <div className="moods-head">
-        <span className="eyebrow">SHOP BY MOOD</span>
+        <span className="eyebrow">SHOP BY COLLECTION</span>
       </div>
       <div className="moods-list">
-        {PRODUCT_THEMES.map((theme) => {
-          const cover = catalog.products.find((p) => p.theme === theme)?.photos[0].src
-          const count = pool.filter((p) => p.theme === theme).length
-          const isOn = selected.includes(theme)
+        {CAMPAIGN_COLLECTIONS.map((collection) => {
           return (
-            <button
-              key={theme}
-              className={`mood${isOn ? ' is-on' : ''}`}
-              aria-pressed={isOn}
-              onClick={() => onToggle(theme)}
-            >
-              {cover && <img src={cover} alt="" loading="lazy" draggable={false} />}
-              <span className="mood-symbol" aria-hidden="true">
-                {THEME_MOODS[theme].symbol}
-              </span>
+            <a key={collection.slug} className="mood" href={collectionHref(collection.slug)}>
+              <img src={collection.image} alt="" loading="lazy" decoding="async" fetchPriority="low" draggable={false} />
               <span className="mood-text">
-                <strong>{theme.toUpperCase()}</strong>
-                <small>{THEME_MOODS[theme].tagline}</small>
+                <strong>{collection.title}</strong>
+                <small>{collection.subtitle}</small>
               </span>
               <span className="mood-count">
-                {isOn ? '✓ SELECTED' : `${count} ${count === 1 ? 'PIECE' : 'PIECES'}`}
+                SHOP NOW →
               </span>
-            </button>
+            </a>
           )
         })}
       </div>

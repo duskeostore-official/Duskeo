@@ -15,7 +15,7 @@ import {
 } from '../../data/searchConfig'
 import { searchHref } from '../../hooks/useHashRoute'
 import type { SearchFilters, SearchMode, SortKey } from '../../types'
-import { activeFilterCount, applyFilters, searchProducts, seededShuffle, sortResults, toggleIn } from '../../utils/search'
+import { activeFilterCount, applyFilters, searchProducts, seededShuffle, sortResults } from '../../utils/search'
 import { ActiveFilters } from './components/ActiveFilters'
 import { FilterPanel } from './components/FilterPanel'
 import { ResultsGrid } from './components/ResultsGrid'
@@ -113,13 +113,7 @@ export function SearchPage({ initialQuery, mode }: SearchPageProps) {
         </div>
       )}
 
-      {isExplore && (
-        <ThemeMoods
-          selected={filters.themes}
-          onToggle={(theme) => setFilters({ ...filters, themes: toggleIn(filters.themes, theme) })}
-          pool={poolProducts}
-        />
-      )}
+      {isExplore && <ThemeMoods />}
 
       <div className="search-layout">
         <aside className="search-sidebar" aria-label="Filters">
