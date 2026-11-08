@@ -1,3 +1,4 @@
+-- Version 007 follows the original 006 address-isolation migration.
 -- Exact place/state lookup cache. This is separate from serviceable_pincodes,
 -- because serviceable_pincodes controls whether delivery is allowed.
 create table if not exists public.pincode_locations (

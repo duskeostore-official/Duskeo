@@ -1,3 +1,4 @@
+-- Version 008 follows the uniquely numbered address and pincode migrations.
 create table if not exists public.storefront_content (
   key text primary key,
   title text not null default '',

@@ -29,7 +29,7 @@ export const FAQ_ITEMS: FaqItem[] = [
   {
     question: 'Can I return or exchange an item?',
     answer:
-      'Please read our Returns & Exchanges Policy before ordering. General change-of-mind returns are not offered, while eligible size exchanges and remedies for defective, damaged or incorrect items are handled under the policy and applicable law.',
+      'You may request a return or exchange within 3 days of delivery. Damaged, defective, or incorrect items should be reported within 24 hours. Please review the policy for eligibility and request details.',
     link: { href: '#policy-returns', label: 'READ RETURNS & EXCHANGES POLICY →' },
   },
   {
@@ -39,6 +39,6 @@ export const FAQ_ITEMS: FaqItem[] = [
   {
     question: 'Can I track my order?',
     answer:
-      "Order tracking will be available once the store's order and shipping systems are connected. For now, contact DUSKEO with your order details for assistance.",
+      'After dispatch, available tracking details appear in {orders}. If tracking is not available or you need help, contact DUSKEO with your order details.',
   },
 ]

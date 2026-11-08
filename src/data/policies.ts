@@ -9,10 +9,11 @@ export const POLICIES: Policy[] = [
     title: 'Shipping & Delivery Policy',
     blocks: [
       { text: 'We aim to process and deliver every DUSKEO order carefully and efficiently.' },
-      { heading: 'Order processing', text: 'Orders are processed after payment confirmation. Orders placed on Sundays or public holidays may be processed on the next working day. We will share an order confirmation after a successful order.' },
-      { heading: 'Delivery estimates', text: 'Estimated delivery timelines and applicable shipping charges will be shown at checkout or communicated before the order is placed. Delivery may take longer in remote areas or during public holidays, weather disruptions, or courier delays.' },
-      { heading: 'Tracking', text: 'Where tracking is available, dispatch and tracking details will be shared using the contact information provided with the order.' },
-      { heading: 'Delivery address', text: 'Please check your name, phone number, and delivery address carefully before placing an order. Contact us as soon as possible if you notice an error. Changes may not be possible after dispatch.' },
+      { heading: 'Shipping charges', text: 'Orders below ₹1,498 have a ₹99 shipping charge. Orders of ₹1,498 or more qualify for free shipping. The applicable charge is shown at checkout before you place your order.' },
+      { heading: 'Order processing', text: 'After an order is successfully confirmed, it is generally dispatched within approximately 2 business days. Processing may take longer during sales, holidays, or exceptional circumstances. We will send an order confirmation after a successful order.' },
+      { heading: 'Delivery estimates', text: 'Delivery across India is estimated at approximately 2–10 days after dispatch. The actual timeline depends on your location and courier partner. Weather, courier-service disruptions, holidays, and other circumstances may cause delays; we will share updates when available.' },
+      { heading: 'Tracking', text: 'After dispatch, available tracking details or a tracking link will appear in {orders} or be shared using the contact information provided with your order. If tracking is not available, contact {email} with your order number.' },
+      { heading: 'Delivery address', text: 'Please check your name, phone number, and delivery address carefully before placing an order. Contact us as soon as possible if you notice an error. Address changes may not be possible after dispatch.' },
       { heading: 'Delayed or missing orders', text: 'If your order has not arrived within the communicated estimate, email {email} with your order number so we can check with the delivery partner.' },
     ],
   },
@@ -22,12 +23,13 @@ export const POLICIES: Policy[] = [
     number: '02 / RETURNS & EXCHANGES',
     title: 'Return & Exchange Policy',
     blocks: [
-      { text: 'We want you to choose the right DUSKEO piece. Please review product details and the size guide before ordering.' },
-      { heading: 'Change-of-mind returns', text: 'DUSKEO does not offer general returns or refunds simply because a customer changes their mind, chooses the wrong size, or no longer wants the product, except where required by applicable law.' },
-      { heading: 'Size exchanges', text: 'Size exchanges may be requested within 7 days of delivery, subject to availability and approval. The item must be unused, unworn, unwashed, undamaged, and returned with its original tags and packaging. Contact us before sending anything back. Exchange shipping arrangements and any applicable charges will be explained before the exchange is confirmed.' },
-      { heading: 'Damaged, defective, or incorrect items', text: 'If your order arrives damaged, defective, or different from what you ordered, contact us as soon as possible, preferably within 48 hours of delivery. Include your order number, a description, and clear photos or video of the issue. We will review the report and arrange an appropriate remedy, such as a replacement, exchange, or refund, as applicable.' },
+      { text: 'You may request a return or exchange within 3 days of delivery. Requests are reviewed under this policy and applicable consumer law.' },
+      { heading: 'Eligibility and item condition', text: 'Items must be unused, unwashed, undamaged, and in their original condition, with original tags and packaging retained. Items that have been used, washed, damaged by the customer, or returned without their original tags may not qualify, subject to rights and remedies under applicable law. Include your order ID and the relevant product details in your request.' },
+      { heading: 'Damaged, defective, or incorrect items', text: 'Report a damaged, defective, or incorrect item within 24 hours of delivery. Include your order ID, product details, a description of the issue, and clear photographs or video. We will review the request before confirming approval or next steps.' },
+      { heading: 'Reverse pickup', text: 'The first approved reverse pickup may be free. Subsequent approved reverse pickups may incur a ₹100 charge. Any applicable charge will be disclosed before pickup is confirmed and remains subject to applicable law.' },
+      { heading: 'Sale and discounted products', text: 'Additional conditions may apply to sale or discounted products only where disclosed before purchase. They do not limit any mandatory rights or remedies under applicable consumer law.' },
       { heading: 'Important', text: 'Nothing in this policy limits any rights or remedies available to customers under applicable consumer protection laws. Do not send an item back before receiving instructions from our support team.' },
-      { heading: 'Request an exchange or report an issue', text: 'Email {email} with your order number, product name, size, and reason for the request.' },
+      { heading: 'Request a return or exchange', text: 'Email {email} within the applicable request window with your order ID, product name, size, and reason. Wait for our review and instructions before sending an item back.' },
     ],
   },
   {
@@ -36,10 +38,10 @@ export const POLICIES: Policy[] = [
     number: '03 / PAYMENTS',
     title: 'Refund Policy',
     blocks: [
-      { text: 'Because DUSKEO does not offer general change-of-mind returns, refunds are considered where an order is cancelled before dispatch, cannot be fulfilled, is covered by an approved remedy for a damaged, defective, or incorrect item, or where a refund is otherwise required by law.' },
-      { heading: 'Refund review', text: 'We may ask for the order number, photos, or other reasonable information to review a reported issue. We will communicate the outcome and next steps.' },
-      { heading: 'Refund method and timing', text: 'Approved refunds will generally be sent to the original payment method where supported. Processing time depends on the payment provider and bank. Any estimated initiation timeline will be communicated when the refund is approved.' },
-      { heading: 'Shipping charges', text: 'Shipping charges will be handled according to the reason for the refund and applicable law. We will explain any applicable charges before proceeding.' },
+      { text: 'Refund requests are reviewed and, if approved, processed in accordance with the Returns & Exchanges Policy, Cancellation Policy, and applicable law.' },
+      { heading: 'Refund review and confirmation', text: 'We may ask for your order ID, product details, photographs, or other reasonable information to review a request. We will notify you when the request is approved and explain the next steps.' },
+      { heading: 'Refund method and timing', text: 'Where applicable and technically possible, an approved refund will be issued to the original payment method. Processing time depends on the payment provider or bank. If store credit is offered, it is an optional alternative and will not replace a monetary refund required by applicable law.' },
+      { heading: 'Shipping charges', text: 'Shipping charges for customer-initiated returns may be non-refundable where permitted by applicable law. Refunds for defective, damaged, incorrect, or undelivered products will be handled in accordance with applicable consumer law. We will explain any applicable treatment when the request is reviewed.' },
       { heading: 'Refund questions', text: 'For an update, email {email} with your order number.' },
     ],
   },
@@ -49,9 +51,9 @@ export const POLICIES: Policy[] = [
     number: '04 / ORDERS',
     title: 'Order Cancellation Policy',
     blocks: [
-      { heading: 'Before dispatch', text: 'If you need to cancel an order, email us as soon as possible with your order number. Cancellation requests received before dispatch can generally be accommodated, subject to confirmation.' },
-      { heading: 'After dispatch', text: 'Once an order has been handed to the delivery partner, it may not be possible to cancel it. Contact us for assistance. Any available options will be explained in line with our other policies and applicable law.' },
-      { heading: 'Cancellation by DUSKEO', text: 'We may need to cancel an order if an item is unavailable, payment cannot be verified, order information is materially incomplete, or there is another legitimate operational or legal reason. If payment has been collected, an applicable refund will be initiated.' },
+      { heading: 'Before dispatch', text: 'You may request cancellation before your order is dispatched. Email {email} as soon as possible with your order ID; cancellation is subject to confirmation.' },
+      { heading: 'After dispatch', text: 'Once an order has been dispatched, cancellation may not be possible. Contact us for assistance; any available options will be explained in line with our other policies and applicable law.' },
+      { heading: 'Cancellation by DUSKEO', text: 'DUSKEO may cancel an order for valid reasons, including stock unavailability, unsuccessful payment, suspected fraudulent activity, or a pricing error. We will notify you if we cancel your order. If payment has been collected, any applicable refund will be processed under the Refund Policy and applicable law.' },
     ],
   },
   {
@@ -60,13 +62,13 @@ export const POLICIES: Policy[] = [
     number: '05 / CUSTOMER INFORMATION',
     title: 'Privacy Policy',
     blocks: [
-      { text: 'DUSKEO respects your privacy and handles personal information for legitimate business purposes.' },
-      { heading: 'Information we may collect', text: 'This may include your name, email address, phone number, billing and delivery address, order and transaction details, customer support messages, and basic device or website-use information.' },
-      { heading: 'How information is used', text: 'We use relevant information to process and deliver orders, confirm payments, share updates, respond to enquiries, manage exchanges and refunds, maintain website security, improve our services, and meet legal obligations.' },
-      { heading: 'Service providers', text: "We may share information that is necessary with payment providers, courier partners, website hosting or technology providers, and authorities where required by law. We do not sell customers' personal information." },
-      { heading: 'Payments and security', text: 'Payment details are handled by the payment provider used at checkout. We do not intend to store complete payment-card credentials on our own systems. We take reasonable steps to protect information, although no online system can guarantee absolute security.' },
-      { heading: 'Retention and requests', text: 'We retain information for as long as reasonably necessary for orders, support, accounting, security, and legal requirements. Subject to applicable law, you may request access to, correction of, or deletion of personal information by emailing {email}.' },
-      { heading: 'Cookies and updates', text: 'Our website may use cookies or similar technologies for essential functions and to understand website usage. We may update this policy when our practices or legal requirements change.' },
+      { text: 'DUSKEO collects and uses customer information to operate the store, fulfil orders, provide support, and meet legal obligations.' },
+      { heading: 'Information we collect', text: 'Depending on how you use the website, this may include your name, email address, phone number, shipping and billing address, order and transaction information, messages sent to customer support, and website or device usage information where applicable.' },
+      { heading: 'How we use information', text: 'We use information to process and deliver orders, communicate order and shipping updates, provide customer support, improve website performance and the shopping experience, help prevent fraud and unauthorized transactions, and comply with applicable legal requirements.' },
+      { heading: 'Service providers', text: 'We share information only as reasonably needed with providers supporting the website and its services, including Vercel for website hosting, Supabase for backend services, the payment provider selected at checkout, and delivery partners. We may also disclose information where required by law.' },
+      { heading: 'Payments and data security', text: 'Payments are processed through third-party payment providers. DUSKEO does not claim to store card details. We use reasonable measures to protect customer information, but no online service can guarantee absolute security.' },
+      { heading: 'Retention and privacy requests', text: 'We retain information for as long as reasonably necessary for order fulfilment, customer support, accounting, security, and legal requirements. For privacy questions or requests concerning your information, email {email}.' },
+      { heading: 'Cookies and updates', text: 'The website may use cookies or similar technologies where needed for site functions or to understand website usage. We may update this policy when our practices or legal requirements change.' },
     ],
   },
   {
@@ -75,11 +77,12 @@ export const POLICIES: Policy[] = [
     number: '06 / WEBSITE USE',
     title: 'Terms & Conditions',
     blocks: [
-      { heading: 'Using our website', text: 'By using the DUSKEO website, you agree to use it lawfully and not to interfere with its security or operation.' },
-      { heading: 'Products and images', text: 'We make reasonable efforts to describe and photograph products accurately. Colors may look different on different screens, and minor variations in fabric, print, or finishing may occur. Please review product descriptions and size information before ordering.' },
-      { heading: 'Prices and orders', text: 'Prices are displayed in Indian Rupees unless stated otherwise. Applicable delivery charges and taxes will be shown where relevant before checkout. Orders are subject to availability and payment confirmation. If we cannot fulfil an order, we will contact you and provide an appropriate resolution.' },
-      { heading: 'Brand and content', text: 'DUSKEO names, logos, original designs, photographs, and website content may not be copied, reproduced, or commercially used without permission, except as allowed by law.' },
-      { heading: 'Legal rights and changes', text: 'These terms do not exclude rights or remedies available under applicable law. We may update website terms from time to time; the latest version will be published here.' },
+      { heading: 'Website usage', text: 'Use the DUSKEO website lawfully. Unauthorized attempts to access, interfere with, or disrupt the website, its accounts, or its systems are prohibited.' },
+      { heading: 'Products and pricing', text: 'We make reasonable efforts to keep product descriptions, images, sizes, colors, and availability accurate. Colors may vary slightly depending on your display settings. Prices and offers may change, subject to applicable law; applicable charges will be shown before you place an order.' },
+      { heading: 'Orders', text: 'Orders are subject to confirmation and product availability. DUSKEO may contact you about your order, including to clarify information or notify you of an issue.' },
+      { heading: 'Payments', text: 'Payment must be completed using a payment method offered at checkout. An order may be cancelled if payment is unsuccessful or fraudulent activity is reasonably suspected. Any applicable refund will be handled under the Refund Policy and applicable law.' },
+      { heading: 'Intellectual property', text: 'DUSKEO branding, logos, website content, images, and original designs may not be copied or used without authorization, except as permitted by law.' },
+      { heading: 'Liability and legal rights', text: 'Nothing in these terms excludes or limits any right, remedy, or protection that cannot lawfully be excluded or limited under applicable Indian law.' },
       { heading: 'Governing law', text: 'These terms are governed by the laws of India, subject to applicable consumer protection laws and the jurisdiction of competent courts.' },
     ],
   },
@@ -104,4 +107,4 @@ export const GRIEVANCE_DETAILS = [
 ]
 
 export const POLICY_NOTE =
-  "Last updated: [Add publication date]. These policies should be reviewed against DUSKEO's actual fulfilment, payment, and support arrangements before launch. Customer rights under applicable Indian law are not limited by these policies."
+  "Last updated: 8 November 2026. The grievance officer and business address details below must be completed before publication. Customer rights under applicable Indian law are not limited by these policies."

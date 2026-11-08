@@ -5,8 +5,11 @@ const POLICY_LINKS = [
   { href: '#faq', label: 'FAQ' },
   { href: '#policy-shipping', label: 'POLICIES' },
   { href: '#policy-returns', label: 'RETURNS & EXCHANGES' },
+  { href: '#policy-refunds', label: 'REFUNDS' },
+  { href: '#policy-cancellation', label: 'CANCELLATION' },
   { href: '#policy-privacy', label: 'PRIVACY' },
   { href: '#policy-terms', label: 'TERMS' },
+  { href: '#policy-grievance', label: 'CONTACT & GRIEVANCE' },
 ]
 
 export function Footer() {
