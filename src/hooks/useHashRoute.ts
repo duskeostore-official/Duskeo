@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ROUTES } from '../constants/routes'
 import { findProduct } from '../data/products'
-import { isCampaignCollectionSlug } from '../data/campaignCollections'
+import { isStoreCollectionSlug } from '../data/campaignCollections'
 import { POLICIES } from '../data/policies'
 import type { Product, Route, SearchMode } from '../types'
 
@@ -16,7 +16,7 @@ export function parseRoute(hash: string, products: Product[] = []): Route {
   if (lower === ROUTES.addresses) return { view: 'addresses' }
   if (lower.startsWith(ROUTES.collectionPrefix)) {
     const slug = lower.slice(ROUTES.collectionPrefix.length)
-    if (isCampaignCollectionSlug(slug)) return { view: 'collection', slug }
+    if (isStoreCollectionSlug(slug)) return { view: 'collection', slug }
   }
   if (lower.startsWith(ROUTES.orderPrefix)) {
     const orderId = Number(lower.slice(ROUTES.orderPrefix.length))

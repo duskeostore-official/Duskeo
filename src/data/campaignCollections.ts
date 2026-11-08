@@ -25,9 +25,20 @@ export const CAMPAIGN_COLLECTIONS = [
   },
 ] as const
 
-export type CampaignCollectionSlug = (typeof CAMPAIGN_COLLECTIONS)[number]['slug']
+export const STORE_COLLECTIONS = [
+  {
+    slug: 'anime',
+    title: 'ANIME',
+    subtitle: 'ANIME COLLECTION',
+    description: '',
+    image: '/campaigns/anime.jpeg',
+  },
+  ...CAMPAIGN_COLLECTIONS,
+] as const
 
-export const isCampaignCollectionSlug = (slug: string): slug is CampaignCollectionSlug =>
-  CAMPAIGN_COLLECTIONS.some((collection) => collection.slug === slug)
+export type StoreCollectionSlug = (typeof STORE_COLLECTIONS)[number]['slug']
 
-export const collectionHref = (slug: CampaignCollectionSlug) => `#collection-${slug}`
+export const isStoreCollectionSlug = (slug: string): slug is StoreCollectionSlug =>
+  STORE_COLLECTIONS.some((collection) => collection.slug === slug)
+
+export const collectionHref = (slug: StoreCollectionSlug) => `#collection-${slug}`

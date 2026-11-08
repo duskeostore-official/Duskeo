@@ -1,4 +1,4 @@
-import { CAMPAIGN_COLLECTIONS, collectionHref } from '../../../data/campaignCollections'
+import { STORE_COLLECTIONS, collectionHref } from '../../../data/campaignCollections'
 
 /** Collection links styled like the existing image-based mood tiles. */
 export function ThemeMoods() {
@@ -8,7 +8,7 @@ export function ThemeMoods() {
         <span className="eyebrow">SHOP BY COLLECTION</span>
       </div>
       <div className="moods-list">
-        {CAMPAIGN_COLLECTIONS.map((collection) => {
+        {STORE_COLLECTIONS.map((collection) => {
           return (
             <a key={collection.slug} className="mood" href={collectionHref(collection.slug)}>
               <img src={collection.image} alt="" loading="lazy" decoding="async" fetchPriority="low" draggable={false} />

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { ProductCard } from '../../components/productCard/ProductCard'
-import { CAMPAIGN_COLLECTIONS, isCampaignCollectionSlug, type CampaignCollectionSlug } from '../../data/campaignCollections'
+import { STORE_COLLECTIONS, isStoreCollectionSlug, type StoreCollectionSlug } from '../../data/campaignCollections'
 import { useCatalog } from '../../context/catalog/useCatalog'
 import { supabase } from '../../lib/supabase'
 import './CampaignCollectionPage.css'
@@ -14,10 +14,13 @@ interface CollectionProductRow {
   } | null
 }
 
-const matchesCollection = (collection: CampaignCollectionSlug, product: CollectionProductRow['products']) => {
+const matchesCollection = (collection: StoreCollectionSlug, product: CollectionProductRow['products']) => {
   if (!product) return false
   const theme = product.attributes?.theme?.toLowerCase() ?? ''
   const tags = new Set((product.tags ?? []).map((tag) => tag.toLowerCase()))
+  if (collection === 'anime') {
+    return theme === 'anime' || ['anime', 'anime-collection'].some((tag) => tags.has(tag))
+  }
   if (collection === 'gym') {
     return ['gym', 'fitness'].includes(theme) || ['gym', 'fitness', 'gym-collection'].some((tag) => tags.has(tag))
   }
@@ -28,8 +31,8 @@ const matchesCollection = (collection: CampaignCollectionSlug, product: Collecti
 }
 
 export function CampaignCollectionPage({ slug }: { slug: string }) {
-  const collectionSlug: CampaignCollectionSlug | null = isCampaignCollectionSlug(slug) ? slug : null
-  const campaign = CAMPAIGN_COLLECTIONS.find((item) => item.slug === collectionSlug)
+  const collectionSlug: StoreCollectionSlug | null = isStoreCollectionSlug(slug) ? slug : null
+  const campaign = STORE_COLLECTIONS.find((item) => item.slug === collectionSlug)
   const catalog = useCatalog()
   const [productSlugs, setProductSlugs] = useState<string[]>([])
   const [loading, setLoading] = useState(true)
@@ -104,7 +107,7 @@ export function CampaignCollectionPage({ slug }: { slug: string }) {
       <section className="campaign-collection-content">
         <p className="page-kicker">DUSKEO / {campaign.subtitle}</p>
         <h1>{campaign.subtitle}</h1>
-        <p className="campaign-collection-description">{campaign.description}</p>
+        {campaign.description && <p className="campaign-collection-description">{campaign.description}</p>}
         {loading ? (
           <p className="campaign-collection-message" role="status">LOADING THE COLLECTION…</p>
         ) : error ? (

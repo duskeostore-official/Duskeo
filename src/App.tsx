@@ -9,7 +9,7 @@ import { LogoFilters } from './components/theme/LogoFilters'
 import { ROUTES } from './constants/routes'
 import { DEFAULT_TITLE, titleFor } from './constants/site'
 import { useCatalog } from './context/catalog/useCatalog'
-import { CAMPAIGN_COLLECTIONS } from './data/campaignCollections'
+import { STORE_COLLECTIONS } from './data/campaignCollections'
 import { POLICIES } from './data/policies'
 import { useHashRoute } from './hooks/useHashRoute'
 import { HomePage } from './pages/home/HomePage'
@@ -39,7 +39,7 @@ function pageTitle(route: Route, findProduct: (slug: string) => { name: string }
     case 'addresses':
       return titleFor('Saved Addresses')
     case 'collection':
-      return titleFor(CAMPAIGN_COLLECTIONS.find((collection) => collection.slug === route.slug)?.subtitle ?? 'Collection')
+      return titleFor(STORE_COLLECTIONS.find((collection) => collection.slug === route.slug)?.subtitle ?? 'Collection')
     case 'search':
       if (route.mode === 'explore') return titleFor('Explore the Collection')
       return titleFor(route.query ? `Search: ${route.query}` : 'Search')

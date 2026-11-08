@@ -2,7 +2,7 @@ import heroImage from '../../../assets/images/home/hero-campaign.webp'
 import { ROUTES } from '../../../constants/routes'
 import { BRAND_TAGLINE } from '../../../constants/site'
 import { useEffect, useMemo, useRef, useState, type PointerEvent } from 'react'
-import { CAMPAIGN_COLLECTIONS } from '../../../data/campaignCollections'
+import { CAMPAIGN_COLLECTIONS, collectionHref } from '../../../data/campaignCollections'
 import { loadStorefrontContent, type StorefrontContent } from '../../../lib/storefront'
 import './Hero.css'
 
@@ -41,7 +41,7 @@ export function Hero() {
         image: campaignOne?.image_url || '/campaigns/anime.jpeg',
         alt: campaignOne?.title || 'ANIME COLLECTION',
         href: campaignOne?.link_url || '#campaign-1',
-        actionHref: ROUTES.collection,
+        actionHref: collectionHref('anime'),
         action: 'SHOP NOW →',
       },
       ...CAMPAIGN_COLLECTIONS.map((campaign) => {
@@ -54,7 +54,7 @@ export function Hero() {
           image: campaign.image,
           alt: `${campaign.title} — ${campaign.subtitle}. ${campaign.description}`,
           href: `#${campaign.campaignKey}`,
-          actionHref: `#collection-${campaign.slug}`,
+          actionHref: collectionHref(campaign.slug),
           action: 'SHOP NOW →',
         }
       }),
@@ -185,7 +185,7 @@ export function Hero() {
           )
         })}
         {activeSlide.key !== 'hero' && (
-          <a className="hero-art-link" href={activeSlide.href} aria-label={`Explore ${activeSlide.title}`} />
+          <a className="hero-art-link" href={activeSlide.actionHref} aria-label={`Explore ${activeSlide.title}`} />
         )}
       </div>
       {slides.length > 1 && (
