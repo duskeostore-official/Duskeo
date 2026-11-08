@@ -5,7 +5,7 @@ import { useCatalog } from '../../context/catalog/useCatalog'
 import { useCart } from '../../context/cart/useCart'
 import { STORE_COLLECTIONS } from '../../data/campaignCollections'
 import { supabase } from '../../lib/supabase'
-import type { Product, ProductTheme, Size, Stock } from '../../types'
+import type { Product, Size, Stock } from '../../types'
 import { zeroStock } from '../../utils/inventory'
 import { StorefrontAdmin } from './StorefrontAdmin'
 import { OrdersAdmin } from './OrdersAdmin'
@@ -20,7 +20,6 @@ export function InventoryAdmin({ onClose }: { onClose: () => void }) {
   const [status, setStatus] = useState('')
   const [name, setName] = useState('')
   const [price, setPrice] = useState('699')
-  const [theme, setTheme] = useState<ProductTheme>('Anime')
   const [selectedCollections, setSelectedCollections] = useState<string[]>([])
   const [description, setDescription] = useState('')
   const [photos, setPhotos] = useState<{ src: string; name: string }[]>([])
@@ -97,7 +96,7 @@ export function InventoryAdmin({ onClose }: { onClose: () => void }) {
       slug,
       name: cleanName.toUpperCase(),
       price: numericPrice,
-      theme,
+      theme: 'Anime',
       launchedAt: new Date().toISOString().slice(0, 10),
       cardAlt: cleanName,
       description: description.trim(),
@@ -179,7 +178,6 @@ export function InventoryAdmin({ onClose }: { onClose: () => void }) {
     }))
     setName('')
     setPrice('699')
-    setTheme('Anime')
     setDescription('')
     setPhotos([])
     setSelectedCollections([])
@@ -252,14 +250,6 @@ export function InventoryAdmin({ onClose }: { onClose: () => void }) {
             <label>
               PRICE (₹)
               <input type="number" min={1} max={1000000} step={1} value={price} onChange={(e) => setPrice(e.target.value)} />
-            </label>
-            <label>
-              THEME
-              <select value={theme} onChange={(e) => setTheme(e.target.value as ProductTheme)}>
-                <option value="Anime">Anime</option>
-                <option value="Samurai">Samurai</option>
-                <option value="Mythic">Mythic</option>
-              </select>
             </label>
             <fieldset className="product-admin-collections">
               <legend>ADD TO COLLECTIONS</legend>
