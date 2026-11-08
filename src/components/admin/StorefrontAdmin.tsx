@@ -6,12 +6,12 @@ const KEYS = ['hero', 'campaign-1', 'campaign-2', 'campaign-3', 'campaign-4']
 const DEFAULT_ITEMS: Record<string, StorefrontContent> = Object.fromEntries(
   KEYS.map((key, index) => [key, {
     key,
-    title: key === 'hero' ? 'BEYOND ORDINARY.' : '',
-    eyebrow: key === 'hero' ? 'THE NEXT CHAPTER' : '',
+    title: key === 'hero' ? 'BEYOND ORDINARY.' : key === 'campaign-1' ? 'ANIME COLLECTION' : '',
+    eyebrow: key === 'hero' ? 'THE NEXT CHAPTER' : key === 'campaign-1' ? 'ANIME COLLECTION' : '',
     body: '',
-    image_url: key === 'hero' ? heroImage : '',
-    link_url: '',
-    active: key === 'hero',
+    image_url: key === 'hero' ? heroImage : key === 'campaign-1' ? '/campaigns/anime.jpeg' : '',
+    link_url: key === 'campaign-1' ? '#collection-anime' : '',
+    active: key === 'hero' || key === 'campaign-1',
     sort_order: index,
   }]),
 )
@@ -29,7 +29,26 @@ export function StorefrontAdmin({ setStatus }: { setStatus: (status: string) => 
       }
       const mapped = Object.fromEntries(data.map((item) => [item.key, item]))
       setItems((current) => Object.fromEntries(
-        KEYS.map((key) => [key, { ...DEFAULT_ITEMS[key], ...mapped[key], image_url: mapped[key]?.image_url || current[key]?.image_url || DEFAULT_ITEMS[key].image_url }]),
+        KEYS.map((key) => {
+          const saved = mapped[key]
+          const defaults = DEFAULT_ITEMS[key]
+          const isUnconfiguredCampaignOne = key === 'campaign-1'
+            && saved
+            && !saved.title
+            && !saved.eyebrow
+            && !saved.body
+            && !saved.image_url
+            && !saved.link_url
+          return [key, {
+            ...defaults,
+            ...saved,
+            title: saved?.title || defaults.title,
+            eyebrow: saved?.eyebrow || defaults.eyebrow,
+            image_url: saved?.image_url || current[key]?.image_url || defaults.image_url,
+            link_url: saved?.link_url || defaults.link_url,
+            active: isUnconfiguredCampaignOne ? true : saved?.active ?? defaults.active,
+          }]
+        }),
       ))
     })
   }, [setStatus])
