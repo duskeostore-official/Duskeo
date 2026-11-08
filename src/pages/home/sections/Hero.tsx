@@ -1,15 +1,16 @@
 import heroImage from '../../../assets/images/home/hero-campaign.webp'
 import { ROUTES } from '../../../constants/routes'
 import { BRAND_TAGLINE } from '../../../constants/site'
-import { useEffect, useMemo, useRef, useState, type PointerEvent } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent } from 'react'
 import { CAMPAIGN_COLLECTIONS, collectionHref } from '../../../data/campaignCollections'
 import { loadStorefrontContent, type StorefrontContent } from '../../../lib/storefront'
 import './Hero.css'
 
 export function Hero() {
   const [storefront, setStorefront] = useState<StorefrontContent[]>([])
-  const [activeIndex, setActiveIndex] = useState(0)
-  const [transitionFromIndex, setTransitionFromIndex] = useState<number | null>(null)
+  const [activeSlideKey, setActiveSlideKey] = useState('hero')
+  const [transitionFromSlideKey, setTransitionFromSlideKey] = useState<string | null>(null)
+  const activeSlideKeyRef = useRef('hero')
   const pointerStart = useRef<{ x: number; y: number } | null>(null)
   const suppressClick = useRef(false)
   const preloadedImages = useRef(new Set<string>())
@@ -60,13 +61,17 @@ export function Hero() {
       }),
     ]
   }, [storefront])
-  const activeSlide = slides[activeIndex] ?? slides[0]
+  const activeSlide = slides.find((slide) => slide.key === activeSlideKey) ?? slides[0]
+  const activeIndex = slides.findIndex((slide) => slide.key === activeSlide.key)
 
-  const goToSlide = (nextIndex: number) => {
-    if (nextIndex === activeIndex) return
-    setTransitionFromIndex(activeIndex)
-    setActiveIndex(nextIndex)
-  }
+  const goToSlide = useCallback((nextSlideKey: string) => {
+    const nextSlide = slides.find((slide) => slide.key === nextSlideKey)
+    const currentSlide = slides.find((slide) => slide.key === activeSlideKeyRef.current) ?? slides[0]
+    if (!nextSlide || nextSlide.key === currentSlide.key) return
+    activeSlideKeyRef.current = nextSlide.key
+    setTransitionFromSlideKey(currentSlide.key)
+    setActiveSlideKey(nextSlide.key)
+  }, [slides])
 
   useEffect(() => {
     if (slides.length < 2 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
@@ -74,8 +79,9 @@ export function Hero() {
     const start = () => {
       if (document.hidden || timer) return
       timer = window.setInterval(() => {
-        setTransitionFromIndex(activeIndex)
-        setActiveIndex((current) => (current + 1) % slides.length)
+        const currentIndex = slides.findIndex((slide) => slide.key === activeSlideKeyRef.current)
+        const nextIndex = (Math.max(currentIndex, 0) + 1) % slides.length
+        goToSlide(slides[nextIndex].key)
       }, 6000)
     }
     const stop = () => {
@@ -92,13 +98,16 @@ export function Hero() {
       stop()
       document.removeEventListener('visibilitychange', onVisibilityChange)
     }
-  }, [activeIndex, slides])
+  }, [goToSlide, slides])
 
   useEffect(() => {
-    if (transitionFromIndex === null) return
-    const timer = window.setTimeout(() => setTransitionFromIndex(null), 1500)
+    if (transitionFromSlideKey === null) return
+    const outgoingKey = transitionFromSlideKey
+    const timer = window.setTimeout(() => {
+      setTransitionFromSlideKey((current) => current === outgoingKey ? null : current)
+    }, 1500)
     return () => window.clearTimeout(timer)
-  }, [activeIndex, transitionFromIndex])
+  }, [activeSlideKey, transitionFromSlideKey])
 
   useEffect(() => {
     const nextImage = slides[(activeIndex + 1) % slides.length]?.image
@@ -132,7 +141,8 @@ export function Hero() {
     window.setTimeout(() => {
       suppressClick.current = false
     }, 250)
-    goToSlide((activeIndex + (deltaX < 0 ? 1 : slides.length - 1)) % slides.length)
+    const nextIndex = (activeIndex + (deltaX < 0 ? 1 : slides.length - 1)) % slides.length
+    goToSlide(slides[nextIndex].key)
   }
 
   const handlePointerUp = (event: PointerEvent<HTMLElement>) => {
@@ -166,22 +176,26 @@ export function Hero() {
         </div>
       </div>
       <div className="hero-art">
-        {[...new Set([transitionFromIndex, activeIndex].filter((index): index is number => index !== null))].map((index) => {
-          const slide = slides[index]
-          const isActive = index === activeIndex
+        {[...new Set([transitionFromSlideKey, activeSlide.key].filter((key): key is string => key !== null))]
+          .map((key) => slides.find((slide) => slide.key === key))
+          .filter((slide) => slide !== undefined)
+          .map((slide) => {
+          const isActive = slide.key === activeSlide.key
           return (
-          <img
-            key={slide.key}
-            className={`hero-art-image${isActive ? ' active' : ' outgoing'}`}
-            src={slide.image}
-            alt={isActive ? slide.alt : ''}
-            aria-hidden={!isActive}
-            fetchPriority={index === 0 ? 'high' : undefined}
-            decoding="async"
-            onAnimationEnd={!isActive ? (event) => {
-              if (event.animationName === 'hero-fade-out') setTransitionFromIndex(null)
-            } : undefined}
-          />
+            <img
+              key={slide.key}
+              className={`hero-art-image${slide.key.startsWith('campaign-') && slide.key !== 'campaign-1' ? ' campaign-art' : ''}${isActive ? ' active' : ' outgoing'}`}
+              src={slide.image}
+              alt={isActive ? slide.alt : ''}
+              aria-hidden={!isActive}
+              fetchPriority={slide.key === 'hero' ? 'high' : undefined}
+              decoding="async"
+              onAnimationEnd={!isActive ? (event) => {
+                if (event.animationName === 'hero-fade-out') {
+                  setTransitionFromSlideKey((current) => current === slide.key ? null : current)
+                }
+              } : undefined}
+            />
           )
         })}
         {activeSlide.key !== 'hero' && (
@@ -197,7 +211,7 @@ export function Hero() {
               className={index === activeIndex ? 'active' : ''}
               aria-label={`Show ${slide.title.replace(/\n/g, ' ')} slide`}
               aria-current={index === activeIndex ? 'true' : undefined}
-              onClick={() => goToSlide(index)}
+              onClick={() => goToSlide(slide.key)}
             />
           ))}
         </div>

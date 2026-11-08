@@ -9,8 +9,8 @@ export const INSTAGRAM_HANDLE = '@duskeo.store'
 export const DEFAULT_TITLE = 'DUSKEO — Beyond Ordinary'
 export const titleFor = (page: string) => `${page} — DUSKEO`
 
-/** Show the placeholder tees from data/dummyProducts.ts. Set false at launch. */
-export const SHOW_DUMMY_PRODUCTS = true
+/** Show placeholder tees from data/dummyProducts.ts during development previews. */
+export const SHOW_DUMMY_PRODUCTS = false
 
 /** Collection rails: auto-drift speed in px/second for each row. */
 export const RAIL_SPEEDS = [32, 24] as const

@@ -41,9 +41,13 @@ export function CampaignCollectionPage({ slug }: { slug: string }) {
 
   useEffect(() => {
     let current = true
+    const requestController = new AbortController()
+    const requestTimeout = window.setTimeout(() => requestController.abort(), 8000)
     if (!collectionSlug) {
       return () => {
         current = false
+        window.clearTimeout(requestTimeout)
+        requestController.abort()
       }
     }
 
@@ -52,6 +56,7 @@ export function CampaignCollectionPage({ slug }: { slug: string }) {
         .from('collections')
         .select('id, is_active')
         .eq('slug', collectionSlug)
+        .abortSignal(requestController.signal)
         .maybeSingle()
 
       if (!current) return
@@ -70,6 +75,7 @@ export function CampaignCollectionPage({ slug }: { slug: string }) {
         .select('sort_order, products!inner(slug, tags, attributes)')
         .eq('collection_id', collection.id)
         .order('sort_order')
+        .abortSignal(requestController.signal)
 
       if (!current) return
       if (productsError) {
@@ -86,6 +92,8 @@ export function CampaignCollectionPage({ slug }: { slug: string }) {
 
     return () => {
       current = false
+      window.clearTimeout(requestTimeout)
+      requestController.abort()
     }
   }, [collectionSlug])
 
@@ -95,6 +103,17 @@ export function CampaignCollectionPage({ slug }: { slug: string }) {
     const product = catalog.products.find((item) => item.slug === productSlug && !item.isDummy)
     return product ? [product] : []
   })
+  const fallbackProducts = collectionSlug
+    ? catalog.products.filter((product) =>
+        !product.isDummy &&
+        matchesCollection(collectionSlug, {
+          slug: product.slug,
+          tags: null,
+          attributes: { theme: product.theme },
+        }),
+      )
+    : []
+  const displayedProducts = products.length ? products : fallbackProducts
 
   return (
     <main className="campaign-collection">
@@ -108,14 +127,13 @@ export function CampaignCollectionPage({ slug }: { slug: string }) {
         <p className="page-kicker">DUSKEO / {campaign.subtitle}</p>
         <h1>{campaign.subtitle}</h1>
         {campaign.description && <p className="campaign-collection-description">{campaign.description}</p>}
-        {loading ? (
-          <p className="campaign-collection-message" role="status">LOADING THE COLLECTION…</p>
-        ) : error ? (
-          <p className="campaign-collection-message" role="alert">{error}</p>
-        ) : products.length ? (
+        {error && <p className="campaign-collection-message" role="alert">{error}</p>}
+        {displayedProducts.length ? (
           <div className="campaign-collection-grid">
-            {products.map((product) => <ProductCard key={product.slug} product={product} />)}
+            {displayedProducts.map((product) => <ProductCard key={product.slug} product={product} />)}
           </div>
+        ) : loading ? (
+          <p className="campaign-collection-message" role="status">LOADING THE COLLECTION…</p>
         ) : (
           <p className="campaign-collection-message">
             {configured

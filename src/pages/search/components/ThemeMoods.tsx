@@ -10,14 +10,19 @@ export function ThemeMoods() {
       <div className="moods-list">
         {STORE_COLLECTIONS.map((collection) => {
           return (
-            <a key={collection.slug} className="mood" href={collectionHref(collection.slug)}>
-              <img src={collection.image} alt="" loading="lazy" decoding="async" fetchPriority="low" draggable={false} />
-              <span className="mood-text">
-                <strong>{collection.title}</strong>
-                <small>{collection.subtitle}</small>
+            <a
+              key={collection.slug}
+              className="mood"
+              href={collectionHref(collection.slug)}
+              aria-label={`Shop ${collection.title} — ${collection.subtitle}`}
+            >
+              <span className="mood-art">
+                <img src={collection.image} alt="" loading="lazy" decoding="async" fetchPriority="low" draggable={false} />
+                <span className="mood-image-title">{collection.title}</span>
               </span>
-              <span className="mood-count">
-                SHOP NOW →
+              <span className="mood-caption">
+                <small>{collection.subtitle}</small>
+                <span>SHOP NOW <span aria-hidden="true">→</span></span>
               </span>
             </a>
           )

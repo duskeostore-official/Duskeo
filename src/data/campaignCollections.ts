@@ -5,7 +5,7 @@ export const CAMPAIGN_COLLECTIONS = [
     title: 'LIMITLESS',
     subtitle: 'GYM COLLECTION',
     description: 'PERFORMANCE. DISCIPLINE. PROGRESS.',
-    image: '/campaigns/limitless.jpeg',
+    image: '/campaigns/limitless-gym.jpeg',
   },
   {
     campaignKey: 'campaign-3',
@@ -13,7 +13,7 @@ export const CAMPAIGN_COLLECTIONS = [
     title: 'LEGACY',
     subtitle: 'MYTHOLOGY COLLECTION',
     description: 'ROOTED IN LEGENDS.',
-    image: '/campaigns/legacy.jpeg',
+    image: '/campaigns/legacy-mythology.jpeg',
   },
   {
     campaignKey: 'campaign-4',
@@ -21,7 +21,7 @@ export const CAMPAIGN_COLLECTIONS = [
     title: 'OBLIVION',
     subtitle: 'DARK COLLECTION',
     description: 'FOR THOSE WHO MOVE IN SHADOWS.',
-    image: '/campaigns/oblivion.jpeg',
+    image: '/campaigns/oblivion-dark.jpeg',
   },
 ] as const
 
@@ -31,7 +31,7 @@ export const STORE_COLLECTIONS = [
     title: 'ANIME',
     subtitle: 'ANIME COLLECTION',
     description: '',
-    image: '/campaigns/anime.jpeg',
+    image: '/campaigns/anime-ronin.jpeg',
   },
   ...CAMPAIGN_COLLECTIONS,
 ] as const

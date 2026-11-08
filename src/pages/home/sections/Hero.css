@@ -238,6 +238,11 @@
     object-position: 61% center;
   }
 
+  .hero-art img.campaign-art {
+    object-fit: contain;
+    object-position: center;
+  }
+
   .hero-art::after {
     background:
       linear-gradient(

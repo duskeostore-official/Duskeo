@@ -425,6 +425,40 @@
   grid-column: 1 / -1;
 }
 
+.product-admin-collections {
+  grid-column: 1 / -1;
+  min-width: 0;
+  margin: 0;
+  border: 1px solid var(--c-border-input);
+  padding: 10px 12px 12px;
+}
+
+.product-admin-collections legend {
+  padding: 0 5px;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+}
+
+.product-admin-collections > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+}
+
+.product-admin-fields .product-admin-collections label {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+}
+
+.product-admin-fields .product-admin-collections input[type='checkbox'] {
+  width: auto;
+  margin: 0;
+  accent-color: var(--c-text-strong);
+}
+
 .product-photo-upload {
   display: inline-block;
   margin-top: 12px;

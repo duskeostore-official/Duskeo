@@ -22,7 +22,7 @@ export function CampaignPage({ slug }: { slug: string }) {
       <main className="campaign-page campaign-page-promo">
         <img
           className="campaign-page-artwork"
-          src={campaign.image_url}
+          src={collection.image}
           alt={`${collection.title} — ${collection.subtitle}. ${collection.description}`}
         />
         <div className="campaign-page-actions">

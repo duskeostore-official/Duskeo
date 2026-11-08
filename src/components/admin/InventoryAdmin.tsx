@@ -3,6 +3,8 @@ import { SIZES } from '../../constants/site'
 import { useInventory } from '../../context/inventory/useInventory'
 import { useCatalog } from '../../context/catalog/useCatalog'
 import { useCart } from '../../context/cart/useCart'
+import { STORE_COLLECTIONS } from '../../data/campaignCollections'
+import { supabase } from '../../lib/supabase'
 import type { Product, ProductTheme, Size, Stock } from '../../types'
 import { zeroStock } from '../../utils/inventory'
 import { StorefrontAdmin } from './StorefrontAdmin'
@@ -19,6 +21,7 @@ export function InventoryAdmin({ onClose }: { onClose: () => void }) {
   const [name, setName] = useState('')
   const [price, setPrice] = useState('699')
   const [theme, setTheme] = useState<ProductTheme>('Anime')
+  const [selectedCollections, setSelectedCollections] = useState<string[]>([])
   const [description, setDescription] = useState('')
   const [photos, setPhotos] = useState<{ src: string; name: string }[]>([])
   const [uploading, setUploading] = useState(false)
@@ -113,6 +116,63 @@ export function InventoryAdmin({ onClose }: { onClose: () => void }) {
 
     const result = await catalog.addProduct(product)
     if (!result.ok) return setStatus(result.error ?? 'Could not add the product.')
+
+    let collectionStatus = ''
+    if (selectedCollections.length) {
+      const { data: savedProduct, error: productLookupError } = await supabase
+        .from('products')
+        .select('id')
+        .eq('slug', product.slug)
+        .single()
+
+      const { data: collections, error: collectionsLookupError } = await supabase
+        .from('collections')
+        .select('id, slug')
+        .in('slug', selectedCollections)
+
+      if (productLookupError || !savedProduct) {
+        collectionStatus = `Product added, but its collection assignment failed: ${productLookupError?.message ?? 'Could not find the saved product.'}`
+      } else if (collectionsLookupError) {
+        collectionStatus = `Product added, but collections could not be loaded: ${collectionsLookupError.message}`
+      } else {
+        const availableCollections = new Map((collections ?? []).map((collection) => [collection.slug, collection.id]))
+        const failedCollections: string[] = []
+        for (const collectionSlug of selectedCollections) {
+          const collectionId = availableCollections.get(collectionSlug)
+          if (!collectionId) {
+            failedCollections.push(collectionSlug)
+            continue
+          }
+
+          const { data: lastProduct, error: orderError } = await supabase
+            .from('collection_products')
+            .select('sort_order')
+            .eq('collection_id', collectionId)
+            .order('sort_order', { ascending: false })
+            .limit(1)
+            .maybeSingle()
+          if (orderError) {
+            failedCollections.push(collectionSlug)
+            continue
+          }
+
+          const { error: assignmentError } = await supabase.from('collection_products').insert({
+            collection_id: collectionId,
+            product_id: savedProduct.id,
+            sort_order: (lastProduct?.sort_order ?? -1) + 1,
+          })
+          if (assignmentError) failedCollections.push(collectionSlug)
+        }
+
+        if (failedCollections.length) {
+          const failedNames = STORE_COLLECTIONS
+            .filter((collection) => failedCollections.includes(collection.slug))
+            .map((collection) => collection.title)
+          collectionStatus = `Product added, but could not add it to: ${failedNames.join(', ')}. Check the collection setup and try again.`
+        }
+      }
+    }
+
     setDraft((current) => ({
       ...current,
       [product.name]: Object.fromEntries(SIZES.map((size) => [size, 0])) as Record<Size, number>,
@@ -122,7 +182,8 @@ export function InventoryAdmin({ onClose }: { onClose: () => void }) {
     setTheme('Anime')
     setDescription('')
     setPhotos([])
-    setStatus(`Product "${product.name}" uploaded successfully.`)
+    setSelectedCollections([])
+    setStatus(collectionStatus || `Product "${product.name}" uploaded successfully.`)
   }
 
   const deleteProduct = async (product: Product) => {
@@ -200,6 +261,25 @@ export function InventoryAdmin({ onClose }: { onClose: () => void }) {
                 <option value="Mythic">Mythic</option>
               </select>
             </label>
+            <fieldset className="product-admin-collections">
+              <legend>ADD TO COLLECTIONS</legend>
+              <div>
+                {STORE_COLLECTIONS.map((collection) => (
+                  <label key={collection.slug}>
+                    <input
+                      type="checkbox"
+                      checked={selectedCollections.includes(collection.slug)}
+                      onChange={(event) => {
+                        setSelectedCollections((current) => event.target.checked
+                          ? [...current, collection.slug]
+                          : current.filter((slug) => slug !== collection.slug))
+                      }}
+                    />
+                    {collection.title}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
             <label className="product-admin-description">
               DESCRIPTION
               <textarea value={description} maxLength={600} rows={3} onChange={(e) => setDescription(e.target.value)} />

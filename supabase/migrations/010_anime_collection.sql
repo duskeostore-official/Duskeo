@@ -1,5 +1,5 @@
 insert into public.collections (name, slug, description, image_key, is_active)
-values ('ANIME COLLECTION', 'anime', null, '/campaigns/anime.jpeg', true)
+values ('ANIME COLLECTION', 'anime', null, '/campaigns/anime-ronin.jpeg', true)
 on conflict (slug) do update set
   name = excluded.name,
   description = excluded.description,

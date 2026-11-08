@@ -1,8 +1,8 @@
 insert into public.storefront_content (key, title, eyebrow, body, image_url, link_url, active, sort_order)
 values
-  ('campaign-2', 'LIMITLESS', 'GYM COLLECTION', 'PERFORMANCE. DISCIPLINE. PROGRESS.', '/campaigns/limitless.jpeg', '#collection-gym', true, 2),
-  ('campaign-3', 'LEGACY', 'MYTHOLOGY COLLECTION', 'ROOTED IN LEGENDS.', '/campaigns/legacy.jpeg', '#collection-mythology', true, 3),
-  ('campaign-4', 'OBLIVION', 'DARK COLLECTION', 'FOR THOSE WHO MOVE IN SHADOWS.', '/campaigns/oblivion.jpeg', '#collection-dark', true, 4)
+  ('campaign-2', 'LIMITLESS', 'GYM COLLECTION', 'PERFORMANCE. DISCIPLINE. PROGRESS.', '/campaigns/limitless-gym.jpeg', '#collection-gym', true, 2),
+  ('campaign-3', 'LEGACY', 'MYTHOLOGY COLLECTION', 'ROOTED IN LEGENDS.', '/campaigns/legacy-mythology.jpeg', '#collection-mythology', true, 3),
+  ('campaign-4', 'OBLIVION', 'DARK COLLECTION', 'FOR THOSE WHO MOVE IN SHADOWS.', '/campaigns/oblivion-dark.jpeg', '#collection-dark', true, 4)
 on conflict (key) do update set
   title = excluded.title,
   eyebrow = excluded.eyebrow,
@@ -15,9 +15,9 @@ on conflict (key) do update set
 
 insert into public.collections (name, slug, description, image_key, is_active)
 values
-  ('GYM COLLECTION', 'gym', 'PERFORMANCE. DISCIPLINE. PROGRESS.', '/campaigns/limitless.jpeg', true),
-  ('MYTHOLOGY COLLECTION', 'mythology', 'ROOTED IN LEGENDS.', '/campaigns/legacy.jpeg', true),
-  ('DARK COLLECTION', 'dark', 'FOR THOSE WHO MOVE IN SHADOWS.', '/campaigns/oblivion.jpeg', true)
+  ('GYM COLLECTION', 'gym', 'PERFORMANCE. DISCIPLINE. PROGRESS.', '/campaigns/limitless-gym.jpeg', true),
+  ('MYTHOLOGY COLLECTION', 'mythology', 'ROOTED IN LEGENDS.', '/campaigns/legacy-mythology.jpeg', true),
+  ('DARK COLLECTION', 'dark', 'FOR THOSE WHO MOVE IN SHADOWS.', '/campaigns/oblivion-dark.jpeg', true)
 on conflict (slug) do update set
   name = excluded.name,
   description = excluded.description,
