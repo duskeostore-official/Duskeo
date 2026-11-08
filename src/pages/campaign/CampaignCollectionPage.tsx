@@ -41,25 +41,32 @@ export function CampaignCollectionPage({ slug }: { slug: string }) {
 
   useEffect(() => {
     let current = true
-    const requestController = new AbortController()
-    const requestTimeout = window.setTimeout(() => requestController.abort(), 8000)
+    let requestId = 0
+    let requestController: AbortController | null = null
+    let requestTimeout: number | undefined
     if (!collectionSlug) {
       return () => {
         current = false
-        window.clearTimeout(requestTimeout)
-        requestController.abort()
       }
     }
 
-    void (async () => {
+    const loadCollection = async () => {
+      const currentRequestId = ++requestId
+      requestController?.abort()
+      if (requestTimeout !== undefined) window.clearTimeout(requestTimeout)
+      const controller = new AbortController()
+      requestController = controller
+      requestTimeout = window.setTimeout(() => controller.abort(), 8000)
+      setError('')
+
       const { data: collection, error: collectionError } = await supabase
         .from('collections')
         .select('id, is_active')
         .eq('slug', collectionSlug)
-        .abortSignal(requestController.signal)
+        .abortSignal(controller.signal)
         .maybeSingle()
 
-      if (!current) return
+      if (!current || currentRequestId !== requestId) return
       if (collectionError) {
         setError('Could not load this collection. Please try again later.')
         setLoading(false)
@@ -75,25 +82,38 @@ export function CampaignCollectionPage({ slug }: { slug: string }) {
         .select('sort_order, products!inner(slug, tags, attributes)')
         .eq('collection_id', collection.id)
         .order('sort_order')
-        .abortSignal(requestController.signal)
+        .abortSignal(controller.signal)
 
-      if (!current) return
+      if (!current || currentRequestId !== requestId) return
       if (productsError) {
         setError('Could not load products for this collection. Please try again later.')
       } else {
         setProductSlugs(
           ((rows ?? []) as unknown as CollectionProductRow[])
-            .flatMap((row) => row.products?.slug && matchesCollection(collectionSlug, row.products) ? [row.products.slug] : []),
+            .flatMap((row) => row.products?.slug ? [row.products.slug] : []),
         )
         setConfigured(true)
       }
       setLoading(false)
-    })()
+      if (requestTimeout !== undefined) window.clearTimeout(requestTimeout)
+      requestTimeout = undefined
+    }
+
+    const onVisibilityChange = () => {
+      if (!document.hidden) void loadCollection()
+    }
+
+    void loadCollection()
+    window.addEventListener('focus', loadCollection)
+    document.addEventListener('visibilitychange', onVisibilityChange)
 
     return () => {
       current = false
-      window.clearTimeout(requestTimeout)
-      requestController.abort()
+      requestId += 1
+      if (requestTimeout !== undefined) window.clearTimeout(requestTimeout)
+      requestController?.abort()
+      window.removeEventListener('focus', loadCollection)
+      document.removeEventListener('visibilitychange', onVisibilityChange)
     }
   }, [collectionSlug])
 
