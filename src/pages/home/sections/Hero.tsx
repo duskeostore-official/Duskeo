@@ -161,7 +161,9 @@ export function Hero() {
         <div className="rule" />
         <p className="tagline">{activeSlide.body}</p>
         {activeSlide.action && <a className="outline" href={activeSlide.actionHref}>{activeSlide.action}</a>}
-        {activeSlide.key === 'hero' && <div className="hero-note">PREMIUM ESSENTIALS {'  '}| {'  '}LIMITED DROPS {'  '}| {'  '}BUILT DIFFERENT</div>}
+        <div className={`hero-note${activeSlide.key === 'hero' ? '' : ' is-hidden'}`} aria-hidden={activeSlide.key !== 'hero'}>
+          PREMIUM ESSENTIALS {'  '}| {'  '}LIMITED DROPS {'  '}| {'  '}BUILT DIFFERENT
+        </div>
       </div>
       <div className="hero-art">
         {[...new Set([transitionFromIndex, activeIndex].filter((index): index is number => index !== null))].map((index) => {
