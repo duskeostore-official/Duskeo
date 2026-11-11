@@ -22,6 +22,18 @@ export function parseRoute(hash: string, products: Product[] = []): Route {
     const orderId = Number(lower.slice(ROUTES.orderPrefix.length))
     if (Number.isInteger(orderId) && orderId > 0) return { view: 'order', orderId }
   }
+  if (lower.startsWith('#checkout-result-')) {
+    const [orderPart, query = ''] = hash.slice('#checkout-result-'.length).split('?')
+    const orderId = Number(orderPart)
+    const state = new URLSearchParams(query).get('state')
+    if (
+      Number.isInteger(orderId) &&
+      orderId > 0 &&
+      (state === 'success' || state === 'failed' || state === 'pending' || state === 'refunded')
+    ) {
+      return { view: 'checkoutResult', orderId, state }
+    }
+  }
   for (const mode of ['search', 'explore'] as const) {
     const base = ROUTES[mode]
     if (lower === base || lower.startsWith(base + '?')) {

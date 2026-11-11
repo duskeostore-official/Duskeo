@@ -1,6 +1,6 @@
 /* Sizes are in em, so everything follows the bag's fluid text size (see Drawer.css). */
 
-/* The list scrolls; the subtotal and checkout notice stay in view. */
+/* The list scrolls; the subtotal and checkout actions stay in view. */
 .cart-items {
   flex: 1;
   min-height: 0;
@@ -138,6 +138,56 @@
   align-items: baseline;
   margin: 1.1em 0;
   font-size: 1.15em;
+}
+
+.cart-checkout {
+  display: grid;
+  gap: 0.8em;
+  padding-bottom: 0.5em;
+}
+
+.cart-checkout-address {
+  display: grid;
+  gap: 0.5em;
+  font-size: 0.72em;
+  letter-spacing: 0.15em;
+  color: var(--c-muted);
+}
+
+.cart-checkout-address select {
+  width: 100%;
+  padding: 0.8em;
+  border: 1px solid var(--c-border-input);
+  background: var(--c-bg-media);
+  color: var(--c-text-strong);
+  font: inherit;
+  font-size: 1.1em;
+  letter-spacing: 0.02em;
+}
+
+.cart-checkout a {
+  text-decoration: underline;
+  color: var(--c-text-strong);
+}
+
+.cart-checkout-status {
+  margin: 0;
+  color: var(--c-text-strong);
+}
+
+.cart-checkout-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7em;
+}
+
+.cart-checkout-actions .outline {
+  flex: 1 1 180px;
+}
+
+.cart-checkout-button {
+  width: 100%;
+  margin-bottom: 1em;
 }
 
 /* Phones: price total moves under the details. */

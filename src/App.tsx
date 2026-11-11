@@ -19,6 +19,7 @@ const AddressesPage = lazy(() => import('./pages/account/AddressesPage').then((m
 const CampaignPage = lazy(() => import('./pages/campaign/CampaignPage').then((module) => ({ default: module.CampaignPage })))
 const CampaignCollectionPage = lazy(() => import('./pages/campaign/CampaignCollectionPage').then((module) => ({ default: module.CampaignCollectionPage })))
 const OrderDetailPage = lazy(() => import('./pages/account/OrderDetailPage').then((module) => ({ default: module.OrderDetailPage })))
+const CheckoutResultPage = lazy(() => import('./pages/checkout/CheckoutResultPage').then((module) => ({ default: module.CheckoutResultPage })))
 const OrdersPage = lazy(() => import('./pages/account/OrdersPage').then((module) => ({ default: module.OrdersPage })))
 const FaqPage = lazy(() => import('./pages/faq/FaqPage').then((module) => ({ default: module.FaqPage })))
 const PoliciesPage = lazy(() => import('./pages/policies/PoliciesPage').then((module) => ({ default: module.PoliciesPage })))
@@ -36,6 +37,8 @@ function pageTitle(route: Route, findProduct: (slug: string) => { name: string }
       return titleFor('My Orders')
     case 'order':
       return titleFor('Order Details')
+    case 'checkoutResult':
+      return titleFor(route.state === 'success' ? 'Thank You for Your Order' : 'Order Update')
     case 'addresses':
       return titleFor('Saved Addresses')
     case 'collection':
@@ -72,6 +75,8 @@ function CurrentPage({
       return <OrdersPage onOpenProfile={onOpenProfile} />
     case 'order':
       return <OrderDetailPage key={route.orderId} orderId={route.orderId} onOpenProfile={onOpenProfile} />
+    case 'checkoutResult':
+      return <CheckoutResultPage key={`${route.orderId}-${route.state}`} orderId={route.orderId} state={route.state} onOpenProfile={onOpenProfile} />
     case 'addresses':
       return <AddressesPage onOpenProfile={onOpenProfile} />
     case 'search':
@@ -137,7 +142,7 @@ export default function App() {
       </Suspense>
       <Footer />
       <ProductModal />
-      <CartDrawer />
+      <CartDrawer onOpenProfile={() => setProfileOpen(true)} />
       <ProfileDrawer open={profileOpen} onClose={() => setProfileOpen(false)} />
     </>
   )

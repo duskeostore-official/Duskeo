@@ -1,0 +1,2 @@
+[functions.payu-callback]
+verify_jwt = false

@@ -91,5 +91,6 @@ export type Route =
   | { view: 'faq' }
   | { view: 'orders' }
   | { view: 'order'; orderId: number }
+  | { view: 'checkoutResult'; orderId: number; state: 'success' | 'failed' | 'pending' | 'refunded' }
   | { view: 'addresses' }
   | { view: 'collection'; slug: string }
