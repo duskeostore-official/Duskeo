@@ -166,6 +166,10 @@ export function Hero() {
       }}
     >
       <div className="hero-copy">
+        <nav className="hero-collection-switch" aria-label="Shop by collection">
+          <a href={ROUTES.top} aria-current="page">MEN</a>
+          <a href={ROUTES.women}>WOMEN <span>COMING SOON</span></a>
+        </nav>
         <div className="eyebrow">{activeSlide.eyebrow}</div>
         <h1>{activeSlide.title.split('\n').map((line, index) => <span key={`${activeSlide.key}-${index}`}>{index > 0 && <br />}{line}</span>)}</h1>
         <div className="rule" />
