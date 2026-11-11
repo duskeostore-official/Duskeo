@@ -39,6 +39,17 @@ export function CheckoutResultPage({
     let attempts = 0
     let timer: number | undefined
     const loadOrder = async () => {
+      const { error: verifyError } = await supabase.functions.invoke('payu-confirm-payment', {
+        body: { orderId },
+      })
+      if (!active) return
+      if (verifyError) {
+        console.error('Could not check the PayU payment status.', verifyError)
+        setLoadError('We’re still checking your payment. Please do not pay again while verification is in progress.')
+      } else {
+        setLoadError('')
+      }
+
       const { data, error } = await supabase
         .from('orders')
         .select('id, order_number, status, total_paise')
@@ -58,12 +69,12 @@ export function CheckoutResultPage({
 
       const nextOrder = data as CheckoutOrder
       setOrder(nextOrder)
-      if (nextOrder.status !== 'pending_payment' || attempts >= 8) {
+      if (nextOrder.status !== 'pending_payment' || attempts >= 30) {
         setChecking(false)
         return
       }
       attempts += 1
-      timer = window.setTimeout(loadOrder, 1500)
+      timer = window.setTimeout(loadOrder, 2000)
     }
 
     void loadOrder()

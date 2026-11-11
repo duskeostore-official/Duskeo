@@ -21,9 +21,10 @@ Apply the database migration and deploy both functions from the repository root:
 supabase db push
 supabase functions deploy payu-hosted-checkout
 supabase functions deploy payu-callback
+supabase functions deploy payu-confirm-payment
 ```
 
-The callback is public because PayU posts to it; it verifies the PayU response hash and checks the transaction with PayU before changing an order. The checkout-creation function remains JWT-protected and checks that the signed-in customer owns the order.
+The callback is public because PayU posts to it; it verifies the PayU response hash and checks the transaction with PayU before changing an order. The checkout-creation and payment-confirmation functions require the signed-in customer and verify order ownership.
 
 ## Before going live
 
