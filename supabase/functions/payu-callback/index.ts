@@ -129,7 +129,13 @@ Deno.serve(async (request) => {
       var1: txnid,
       hash: verifyHash,
     })
-    let verified: { status?: string; amount?: string; mihpayid?: string; mode?: string } | undefined
+    let verified: {
+      status?: string
+      amt?: string | number
+      amount?: string | number
+      mihpayid?: string
+      mode?: string
+    } | undefined
     try {
       const verifyResponse = await fetch(verifyUrl, {
         method: 'POST',
@@ -138,13 +144,20 @@ Deno.serve(async (request) => {
       })
       if (!verifyResponse.ok) return redirect(resultUrl(storeUrl, order.id, 'pending'))
       const verifyData = await verifyResponse.json() as {
-        transaction_details?: Record<string, { status?: string; amount?: string; mihpayid?: string; mode?: string }>
+        transaction_details?: Record<string, {
+          status?: string
+          amt?: string | number
+          amount?: string | number
+          mihpayid?: string
+          mode?: string
+        }>
       }
       verified = verifyData.transaction_details?.[txnid]
     } catch {
       return redirect(resultUrl(storeUrl, order.id, 'pending'))
     }
-    const verifiedAmount = verified?.amount === undefined ? null : toPaise(String(verified.amount))
+    const payuAmount = verified?.amt ?? verified?.amount
+    const verifiedAmount = payuAmount === undefined ? null : toPaise(String(payuAmount))
     if (verified?.status?.toLowerCase() !== 'success' || verifiedAmount === null || !verified.mihpayid) {
       return redirect(resultUrl(storeUrl, order.id, 'pending'))
     }
@@ -157,7 +170,7 @@ Deno.serve(async (request) => {
       txnid,
       mihpayid: verified.mihpayid,
       mode: verified.mode ?? mode ?? '',
-      amount: verified.amount ?? amount,
+      amount: String(payuAmount),
     }
   }
 

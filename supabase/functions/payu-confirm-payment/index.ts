@@ -104,7 +104,13 @@ Deno.serve(async (request) => {
   })
 
   let verifyData: {
-    transaction_details?: Record<string, { status?: string; amount?: string; mihpayid?: string; mode?: string }>
+    transaction_details?: Record<string, {
+      status?: string
+      amt?: string | number
+      amount?: string | number
+      mihpayid?: string
+      mode?: string
+    }>
   }
   try {
     const response = await fetch(verifyUrl, {
@@ -137,11 +143,12 @@ Deno.serve(async (request) => {
     return json({ status: normalizedStatus === 'failure' ? 'failed' : 'pending' })
   }
 
-  const amountPaise = verified?.amount === undefined ? null : toPaise(String(verified.amount))
+  const verifiedAmount = verified?.amt ?? verified?.amount
+  const amountPaise = verifiedAmount === undefined ? null : toPaise(String(verifiedAmount))
   if (amountPaise === null || !verified?.mihpayid) {
     console.error('PayU reported success without a verifiable amount or payment ID.', {
       orderId,
-      hasAmount: verified?.amount !== undefined,
+      hasAmount: verifiedAmount !== undefined,
       hasPaymentId: Boolean(verified?.mihpayid),
     })
     return json({ status: 'pending' })
@@ -172,7 +179,7 @@ Deno.serve(async (request) => {
       txnid,
       mihpayid: String(verified.mihpayid),
       mode: verified.mode ?? '',
-      amount: verified.amount ?? '',
+      amount: String(verifiedAmount),
     },
   })
   if (applyError) return json({ error: 'Could not finalize the PayU payment.' }, 500)
