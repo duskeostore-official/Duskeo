@@ -89,6 +89,7 @@ export function OrdersAdmin() {
     let orderQuery = supabase
       .from('orders')
       .select(ORDER_COLUMNS, { count: 'exact' })
+      .eq('status', 'placed')
       .order('created_at', { ascending: false })
       .range(page * PAGE_SIZE, (page + 1) * PAGE_SIZE - 1)
 
@@ -229,7 +230,7 @@ export function OrdersAdmin() {
     <section className="orders-admin" aria-labelledby="admin-orders-heading">
       <div className="orders-admin-head">
         <div>
-          <h3 id="admin-orders-heading">CUSTOMER ORDERS</h3>
+          <h3 id="admin-orders-heading">PLACED ORDERS</h3>
           <p>{totalOrders} order{totalOrders === 1 ? '' : 's'}{query.trim() ? ' matching your search' : ''}</p>
         </div>
         <button type="button" onClick={() => void loadOrders(true)} disabled={loading || refreshing}>
