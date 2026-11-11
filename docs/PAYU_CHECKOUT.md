@@ -6,12 +6,14 @@ The cart uses PayU Hosted Checkout. Customers sign in, select a saved delivery a
 
 In the Supabase project dashboard, add these Edge Function secrets:
 
-- `PAYU_MERCHANT_KEY` — the merchant key for the selected PayU environment
-- `PAYU_MERCHANT_SALT` — the matching merchant salt; keep this server-side
-- `PAYU_ENV` — `test` or `production` (use `test` until the integration is verified)
+- `PAYU_MERCHANT_KEY` and `PAYU_MERCHANT_SALT` — the matching test credentials
+- `PAYU_LIVE_MERCHANT_KEY` and `PAYU_LIVE_MERCHANT_SALT` — the matching production credentials
+- `PAYU_ENV` — `test` or `production` (defaults to `test`)
 - `STORE_URL` — the public HTTPS URL of the storefront, without a path
 
 Supabase provides `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` to Edge Functions. Do not put the merchant salt or service-role key in a `VITE_` variable, frontend code, or a committed environment file. Do not send secrets in chat.
+
+The checkout and callback functions select the matching credential pair based on `PAYU_ENV`; keep test and production credentials separate.
 
 Apply the database migration and deploy both functions from the repository root:
 

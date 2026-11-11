@@ -46,10 +46,10 @@ Deno.serve(async (request) => {
 
   const supabaseUrl = Deno.env.get('SUPABASE_URL')
   const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
-  const merchantKey = Deno.env.get('PAYU_MERCHANT_KEY')
-  const merchantSalt = Deno.env.get('PAYU_MERCHANT_SALT')
   const storeUrl = Deno.env.get('STORE_URL')
   const environment = Deno.env.get('PAYU_ENV') ?? 'test'
+  const merchantKey = Deno.env.get(environment === 'production' ? 'PAYU_LIVE_MERCHANT_KEY' : 'PAYU_MERCHANT_KEY')
+  const merchantSalt = Deno.env.get(environment === 'production' ? 'PAYU_LIVE_MERCHANT_SALT' : 'PAYU_MERCHANT_SALT')
   if (!supabaseUrl || !serviceRoleKey || !merchantKey || !merchantSalt || !storeUrl) {
     return errorResponse('Payment service is not configured.', 500)
   }
