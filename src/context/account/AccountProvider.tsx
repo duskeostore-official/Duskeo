@@ -167,6 +167,19 @@ export function AccountProvider({ children }: { children: ReactNode }) {
     [loadAddresses, userId],
   )
 
+  const cancelOrder = useCallback(
+    async (id: number) => {
+      if (!userId) return { ok: false, error: 'Please sign in first.' }
+      const { error } = await supabase.rpc('cancel_order', { p_order_id: id })
+      if (error) return { ok: false, error: error.message }
+      setOrders((current) =>
+        current.map((order) => (order.id === id ? { ...order, status: 'cancelled' } : order)),
+      )
+      return { ok: true }
+    },
+    [userId],
+  )
+
   const updateProfile = useCallback(
     async (profile: {
       fullName: string
@@ -220,8 +233,9 @@ export function AccountProvider({ children }: { children: ReactNode }) {
       updateAddress,
       setDefaultAddress,
       deleteAddress,
+      cancelOrder,
     }),
-    [userId, ready, name, email, phone, gender, dateOfBirth, addresses, orders, loading, updateProfile, addAddress, updateAddress, setDefaultAddress, deleteAddress],
+    [userId, ready, name, email, phone, gender, dateOfBirth, addresses, orders, loading, updateProfile, addAddress, updateAddress, setDefaultAddress, deleteAddress, cancelOrder],
   )
 
   return <AccountContext.Provider value={value}>{children}</AccountContext.Provider>

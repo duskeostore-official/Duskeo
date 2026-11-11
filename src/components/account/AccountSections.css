@@ -117,6 +117,33 @@
   gap: 12px;
 }
 
+.acct-order-entry {
+  display: grid;
+  gap: 6px;
+}
+
+.acct-order-cancel {
+  justify-self: end;
+  padding: 5px 0;
+  border: 0;
+  background: transparent;
+  color: var(--c-muted);
+  font: inherit;
+  font-size: 0.7em;
+  letter-spacing: 0.12em;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.acct-order-cancel:disabled {
+  opacity: 0.55;
+}
+
+.acct-order-cancel-error {
+  color: var(--c-error, #b42318);
+  font-size: 0.85em;
+}
+
 .acct-order > div {
   display: flex;
   flex-direction: column;

@@ -54,6 +54,7 @@ export interface AccountContextValue {
   updateAddress: (id: number, address: NewAddress, makeDefault: boolean) => Promise<{ ok: boolean; error?: string }>
   setDefaultAddress: (id: number) => Promise<{ ok: boolean; error?: string }>
   deleteAddress: (id: number) => Promise<{ ok: boolean; error?: string }>
+  cancelOrder: (id: number) => Promise<{ ok: boolean; error?: string }>
 }
 
 export const AccountContext = createContext<AccountContextValue | null>(null)
