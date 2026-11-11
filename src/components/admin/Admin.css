@@ -317,6 +317,21 @@
   cursor: not-allowed;
 }
 
+.orders-admin-rate-check {
+  margin-bottom: 10px;
+}
+
+.orders-admin-rate-result {
+  max-height: 240px;
+  overflow: auto;
+  border: 1px solid var(--c-border);
+  padding: 10px;
+  color: var(--c-text-dim);
+  font-size: 10px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
 .orders-admin-print-actions {
   display: flex;
   justify-content: flex-end;

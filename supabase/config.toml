@@ -1,2 +1,5 @@
 [functions.payu-callback]
 verify_jwt = false
+
+[functions.nimbuspost-serviceability]
+verify_jwt = true

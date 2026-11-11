@@ -300,12 +300,14 @@ export function OrdersAdmin() {
                   <div className="orders-admin-fulfillment">
                     <strong>FULFILLMENT & TRACKING</strong>
                     {[...unshippedGroups.entries()].map(([warehouseId, warehouseItems]) => (
-                      <CreateShipmentForm
-                        key={`${order.id}-${warehouseId}`}
-                        warehouseId={warehouseId}
-                        items={warehouseItems}
-                        onCreate={(courier, awb, url) => createShipment(order.id, warehouseItems.map((item) => item.id), courier, awb, url)}
-                      />
+                      <div key={`${order.id}-${warehouseId}`}>
+                        <NimbusPostRateCheck orderId={order.id} items={warehouseItems} />
+                        <CreateShipmentForm
+                          warehouseId={warehouseId}
+                          items={warehouseItems}
+                          onCreate={(courier, awb, url) => createShipment(order.id, warehouseItems.map((item) => item.id), courier, awb, url)}
+                        />
+                      </div>
                     ))}
                     {orderShipments.map((shipment) => (
                       <ShipmentEditor
@@ -389,6 +391,62 @@ export function OrdersAdmin() {
         </nav>
       )}
     </section>
+  )
+}
+
+function NimbusPostRateCheck({ orderId, items }: { orderId: number; items: AdminOrderItem[] }) {
+  const [weightGrams, setWeightGrams] = useState('')
+  const [lengthCm, setLengthCm] = useState('')
+  const [widthCm, setWidthCm] = useState('')
+  const [heightCm, setHeightCm] = useState('')
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState('')
+  const [result, setResult] = useState('')
+
+  const checkRates = async () => {
+    setBusy(true)
+    setError('')
+    setResult('')
+    const { data, error: invokeError } = await supabase.functions.invoke('nimbuspost-serviceability', {
+      body: {
+        orderId,
+        itemIds: items.map((item) => item.id),
+        parcel: {
+          weightGrams: Number(weightGrams),
+          lengthCm: Number(lengthCm),
+          widthCm: Number(widthCm),
+          heightCm: Number(heightCm),
+        },
+      },
+    })
+    setBusy(false)
+    if (invokeError) {
+      setError(invokeError.message)
+      return
+    }
+    if (data?.error) {
+      setError(String(data.error))
+      return
+    }
+    setResult(JSON.stringify(data?.result ?? data, null, 2))
+  }
+
+  return (
+    <div className="orders-admin-shipment-form orders-admin-rate-check">
+      <strong>CHECK NIMBUSPOST RATES · WAREHOUSE {items[0]?.warehouse_id}</strong>
+      <span>Rate check only; this does not book a courier or pickup.</span>
+      <div>
+        <input aria-label={`Parcel weight in grams for order ${orderId}`} type="number" min="1" max="50000" step="1" value={weightGrams} onChange={(event) => setWeightGrams(event.target.value)} placeholder="Weight (g)" />
+        <input aria-label={`Parcel length in cm for order ${orderId}`} type="number" min="1" max="200" step="0.1" value={lengthCm} onChange={(event) => setLengthCm(event.target.value)} placeholder="Length (cm)" />
+        <input aria-label={`Parcel width in cm for order ${orderId}`} type="number" min="1" max="200" step="0.1" value={widthCm} onChange={(event) => setWidthCm(event.target.value)} placeholder="Width (cm)" />
+        <input aria-label={`Parcel height in cm for order ${orderId}`} type="number" min="1" max="200" step="0.1" value={heightCm} onChange={(event) => setHeightCm(event.target.value)} placeholder="Height (cm)" />
+        <button type="button" disabled={busy || !weightGrams || !lengthCm || !widthCm || !heightCm} onClick={() => void checkRates()}>
+          {busy ? 'CHECKING…' : 'CHECK RATES'}
+        </button>
+      </div>
+      {error && <span className="orders-admin-error" role="alert">{error}</span>}
+      {result && <pre className="orders-admin-rate-result" role="status">{result}</pre>}
+    </div>
   )
 }
 

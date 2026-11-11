@@ -1,5 +1,17 @@
 # React + TypeScript + Vite
 
+## NimbusPost rate checks
+
+The admin order screen can request serviceability and courier rates for unshipped order items. This check is read-only: it does not book a shipment or schedule a pickup. Parcel weight is entered in grams and dimensions in centimeters.
+
+Deploy `supabase/functions/nimbuspost-serviceability` and configure these values as Supabase Edge Function secrets (never in frontend variables or committed files):
+
+- `NIMBUSPOST_API_KEY`
+- `NIMBUSPOST_API_SECRET`
+- `NIMBUSPOST_PICKUP_PINCODE`
+
+The Edge Function also requires Supabase's standard `SUPABASE_URL`, `SUPABASE_ANON_KEY`, and `SUPABASE_SERVICE_ROLE_KEY` secrets. NimbusPost API credentials should only be generated and stored through a secure channel; rotate any key whose secret was exposed.
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:
