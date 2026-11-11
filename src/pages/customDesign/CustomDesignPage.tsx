@@ -93,7 +93,7 @@ export function CustomDesignPage() {
       <header className="custom-design-header">
         <span>MADE YOUR WAY</span>
         <h1>ORDER YOUR CUSTOM DESIGN</h1>
-        <p>Share your idea and, if you have them, upload images of the front and back. We’ll review your request and contact you about availability, pricing, and next steps. Submitting a request does not place an order or charge you.</p>
+        <p>Custom design price: ₹699. Share your idea and, if you have them, upload images of the front and back. Submitting a request does not place an order or charge you; we’ll contact you to confirm the details and next steps.</p>
       </header>
 
       {submitted ? (

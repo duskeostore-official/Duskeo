@@ -7,7 +7,7 @@ export function CustomDesignPromo() {
       <div>
         <span className="custom-design-kicker">MADE YOUR WAY</span>
         <h2 id="custom-design-promo-title">HAVE A DESIGN IN MIND?</h2>
-        <p>Tell us what you’re imagining. We’ll review your idea and get back to you about the next steps.</p>
+        <p>Custom design orders are ₹699. Share your idea and we’ll get back to you about the next steps.</p>
       </div>
       <a className="outline" href={ROUTES.customDesign}>ORDER YOUR CUSTOM DESIGN →</a>
     </section>
