@@ -2,7 +2,7 @@
 
 ## NimbusPost rate checks
 
-The admin order screen can request serviceability and courier rates for unshipped order items. This check is read-only: it does not book a shipment or schedule a pickup. Parcel weight is entered in grams and dimensions in centimeters.
+The admin order screen automatically requests serviceability and courier rates for each unshipped warehouse group when placed orders are loaded. It uses a default packed parcel of 499 g and 30 × 25 × 5 cm; admins can edit these values and recheck when an order needs a different parcel size. This check is read-only: it does not book a shipment or schedule a pickup. Parcel weight is in grams and dimensions are in centimeters.
 
 Deploy `supabase/functions/nimbuspost-serviceability` and configure these values as Supabase Edge Function secrets (never in frontend variables or committed files):
 
