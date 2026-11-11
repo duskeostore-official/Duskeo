@@ -113,22 +113,37 @@ Deno.serve(async (request) => {
       body: verifyBody,
     })
     if (!response.ok) {
-      console.error('PayU payment verification returned an unsuccessful HTTP status.', response.status)
+      console.error('PayU payment verification returned an unsuccessful HTTP status.', {
+        orderId,
+        status: response.status,
+      })
       return json({ status: 'pending' })
     }
     verifyData = await response.json()
   } catch (error) {
-    console.error('PayU payment verification request failed.', error)
+    console.error('PayU payment verification request failed.', { orderId, error })
     return json({ status: 'pending' })
   }
 
   const verified = verifyData.transaction_details?.[txnid]
   const normalizedStatus = verified?.status?.toLowerCase()
-  if (normalizedStatus !== 'success') return json({ status: normalizedStatus === 'failure' ? 'failed' : 'pending' })
+  if (normalizedStatus !== 'success') {
+    console.error('PayU verification did not confirm a successful transaction.', {
+      orderId,
+      transactionFound: Boolean(verified),
+      transactionCount: Object.keys(verifyData.transaction_details ?? {}).length,
+      status: normalizedStatus ?? 'missing',
+    })
+    return json({ status: normalizedStatus === 'failure' ? 'failed' : 'pending' })
+  }
 
   const amountPaise = verified?.amount === undefined ? null : toPaise(String(verified.amount))
   if (amountPaise === null || !verified?.mihpayid) {
-    console.error('PayU reported a successful payment without a verifiable amount or payment ID.')
+    console.error('PayU reported success without a verifiable amount or payment ID.', {
+      orderId,
+      hasAmount: verified?.amount !== undefined,
+      hasPaymentId: Boolean(verified?.mihpayid),
+    })
     return json({ status: 'pending' })
   }
 
