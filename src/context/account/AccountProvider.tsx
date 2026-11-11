@@ -89,12 +89,32 @@ export function AccountProvider({ children }: { children: ReactNode }) {
         supabase.from('orders').select(ORDER_COLUMNS).order('created_at', { ascending: false }).limit(100),
       ])
       if (cancelled) return
+      if (orderRows.error) console.error('Could not load customer orders.', orderRows.error)
+      const pendingOrders = (orderRows.data as OrderSummary[] | null)?.filter(
+        (order) => order.status === 'pending_payment',
+      ).slice(0, 10) ?? []
+      const verificationResults = await Promise.all(
+        pendingOrders.map((order) => supabase.functions.invoke('payu-confirm-payment', {
+          body: { orderId: order.id },
+        })),
+      )
+      if (verificationResults.some((result) => result.error)) {
+        console.error(
+          'Could not verify one or more pending PayU orders.',
+          verificationResults.filter((result) => result.error).map((result) => result.error),
+        )
+      }
+      const refreshedOrders = pendingOrders.length
+        ? await supabase.from('orders').select(ORDER_COLUMNS).order('created_at', { ascending: false }).limit(100)
+        : orderRows
+      if (cancelled) return
+      if (refreshedOrders.error) console.error('Could not refresh customer orders after payment verification.', refreshedOrders.error)
       setName(profile.data?.full_name ?? '')
       setEmail(profile.data?.email ?? authEmail)
       setPhone(profile.data?.phone ?? '')
       setGender(profile.data?.gender ?? '')
       setDateOfBirth(profile.data?.date_of_birth ?? '')
-      setOrders((orderRows.data as OrderSummary[] | null) ?? [])
+      setOrders((refreshedOrders.data as OrderSummary[] | null) ?? [])
       setLoading(false)
     }, 0)
     return () => {
