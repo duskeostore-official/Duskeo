@@ -511,6 +511,13 @@
   white-space: pre-wrap;
 }
 
+.custom-request-images {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 10px;
+}
+
 @media (max-width: 560px) {
   .inventory-admin .admin-sections {
     flex-wrap: wrap;

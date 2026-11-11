@@ -11,7 +11,8 @@ interface CustomDesignRequest {
   garment: string
   size: string | null
   details: string
-  image_path: string | null
+  front_image_path: string | null
+  back_image_path: string | null
   status: RequestStatus
   created_at: string
 }
@@ -20,7 +21,7 @@ const STATUSES: RequestStatus[] = ['new', 'reviewing', 'contacted', 'closed']
 
 export function CustomDesignRequestsAdmin() {
   const [requests, setRequests] = useState<CustomDesignRequest[]>([])
-  const [imageUrls, setImageUrls] = useState<Record<number, string>>({})
+  const [imageUrls, setImageUrls] = useState<Record<number, { front?: string; back?: string }>>({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -29,7 +30,7 @@ export function CustomDesignRequestsAdmin() {
     setError('')
     const { data, error: loadError } = await supabase
       .from('custom_design_requests')
-      .select('id, customer_name, email, phone, garment, size, details, image_path, status, created_at')
+      .select('id, customer_name, email, phone, garment, size, details, front_image_path, back_image_path, status, created_at')
       .order('created_at', { ascending: false })
     if (loadError) {
       setError(`Could not load custom design requests: ${loadError.message}`)
@@ -38,20 +39,27 @@ export function CustomDesignRequestsAdmin() {
     }
 
     const loadedRequests = (data ?? []) as CustomDesignRequest[]
-    const signedImages = await Promise.all(loadedRequests.flatMap((request) => {
-      if (!request.image_path) return []
-      return [supabase.storage.from('custom-design-requests').createSignedUrl(request.image_path, 60 * 60)]
-    }))
-    const nextUrls: Record<number, string> = {}
-    let imageIndex = 0
-    for (const request of loadedRequests) {
-      if (!request.image_path) continue
-      const signedImage = signedImages[imageIndex++]
-      if (signedImage.error) {
-        setError(`Requests loaded, but an uploaded design image could not be opened: ${signedImage.error.message}`)
-        continue
+    const signedImages = await Promise.all(loadedRequests.flatMap((request) => [
+      request.front_image_path
+        ? supabase.storage.from('custom-design-requests').createSignedUrl(request.front_image_path, 60 * 60)
+        : Promise.resolve(null),
+      request.back_image_path
+        ? supabase.storage.from('custom-design-requests').createSignedUrl(request.back_image_path, 60 * 60)
+        : Promise.resolve(null),
+    ]))
+    const nextUrls: Record<number, { front?: string; back?: string }> = {}
+    for (let index = 0; index < loadedRequests.length; index++) {
+      const request = loadedRequests[index]
+      const frontImage = signedImages[index * 2]
+      const backImage = signedImages[index * 2 + 1]
+      if (frontImage?.error || backImage?.error) {
+        const imageError = frontImage?.error ?? backImage?.error
+        setError(`Requests loaded, but an uploaded design image could not be opened: ${imageError.message}`)
       }
-      nextUrls[request.id] = signedImage.data.signedUrl
+      nextUrls[request.id] = {
+        front: frontImage && !frontImage.error ? frontImage.data.signedUrl : undefined,
+        back: backImage && !backImage.error ? backImage.data.signedUrl : undefined,
+      }
     }
     setRequests(loadedRequests)
     setImageUrls(nextUrls)
@@ -118,9 +126,10 @@ export function CustomDesignRequestsAdmin() {
               </p>
               <p>{request.garment}{request.size ? ` · Size ${request.size}` : ''}</p>
               <p className="custom-request-details">{request.details}</p>
-              {request.image_path && imageUrls[request.id] && (
-                <a href={imageUrls[request.id]} target="_blank" rel="noreferrer">VIEW DESIGN IMAGE</a>
-              )}
+              <div className="custom-request-images">
+                {imageUrls[request.id]?.front && <a href={imageUrls[request.id].front} target="_blank" rel="noreferrer">VIEW FRONT DESIGN</a>}
+                {imageUrls[request.id]?.back && <a href={imageUrls[request.id].back} target="_blank" rel="noreferrer">VIEW BACK DESIGN</a>}
+              </div>
             </article>
           ))}
         </div>

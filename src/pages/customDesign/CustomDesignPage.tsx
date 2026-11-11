@@ -12,7 +12,8 @@ export function CustomDesignPage() {
   const [garment, setGarment] = useState('T-shirt')
   const [size, setSize] = useState('')
   const [details, setDetails] = useState('')
-  const [designFile, setDesignFile] = useState<File | null>(null)
+  const [frontFile, setFrontFile] = useState<File | null>(null)
+  const [backFile, setBackFile] = useState<File | null>(null)
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState('')
   const [submitted, setSubmitted] = useState(false)
@@ -21,25 +22,38 @@ export function CustomDesignPage() {
     event.preventDefault()
     setMessage('')
 
-    if (designFile && !ALLOWED_TYPES.includes(designFile.type)) {
-      setMessage('Upload a JPG, PNG, or WebP image.')
+    const designFiles = [frontFile, backFile].filter((file): file is File => file !== null)
+    const invalidFile = designFiles.find((file) => !ALLOWED_TYPES.includes(file.type))
+    if (invalidFile) {
+      setMessage(`${invalidFile.name}: upload a JPG, PNG, or WebP image.`)
       return
     }
-    if (designFile && designFile.size > MAX_FILE_SIZE) {
-      setMessage('Your image must be 5 MB or smaller.')
+    const oversizedFile = designFiles.find((file) => file.size > MAX_FILE_SIZE)
+    if (oversizedFile) {
+      setMessage(`${oversizedFile.name}: images must be 5 MB or smaller.`)
       return
     }
 
     setBusy(true)
-    let imagePath: string | null = null
+    let frontImagePath: string | null = null
+    let backImagePath: string | null = null
     try {
-      if (designFile) {
-        const extension = designFile.type === 'image/jpeg' ? 'jpg' : designFile.type.split('/')[1]
-        imagePath = `${crypto.randomUUID()}.${extension}`
-        const { error: uploadError } = await supabase.storage
+      if (frontFile) {
+        const frontExtension = frontFile.type === 'image/jpeg' ? 'jpg' : frontFile.type.split('/')[1]
+        frontImagePath = `${crypto.randomUUID()}-front.${frontExtension}`
+        const { error: frontUploadError } = await supabase.storage
           .from('custom-design-requests')
-          .upload(imagePath, designFile, { contentType: designFile.type, upsert: false })
-        if (uploadError) throw new Error(`Could not upload your image: ${uploadError.message}`)
+          .upload(frontImagePath, frontFile, { contentType: frontFile.type, upsert: false })
+        if (frontUploadError) throw new Error(`Could not upload the front image: ${frontUploadError.message}`)
+      }
+
+      if (backFile) {
+        const backExtension = backFile.type === 'image/jpeg' ? 'jpg' : backFile.type.split('/')[1]
+        backImagePath = `${crypto.randomUUID()}-back.${backExtension}`
+        const { error: backUploadError } = await supabase.storage
+          .from('custom-design-requests')
+          .upload(backImagePath, backFile, { contentType: backFile.type, upsert: false })
+        if (backUploadError) throw new Error(`Could not upload the back image: ${backUploadError.message}`)
       }
 
       const { error } = await supabase.from('custom_design_requests').insert({
@@ -49,7 +63,8 @@ export function CustomDesignPage() {
         garment,
         size: size || null,
         details: details.trim(),
-        image_path: imagePath,
+        front_image_path: frontImagePath,
+        back_image_path: backImagePath,
       })
       if (error) throw new Error(`Could not send your request: ${error.message}`)
       setSubmitted(true)
@@ -59,8 +74,14 @@ export function CustomDesignPage() {
       setGarment('T-shirt')
       setSize('')
       setDetails('')
-      setDesignFile(null)
+      setFrontFile(null)
+      setBackFile(null)
     } catch (error) {
+      const uploadedPaths = [frontImagePath, backImagePath].filter((path): path is string => path !== null)
+      if (uploadedPaths.length) {
+        const { error: cleanupError } = await supabase.storage.from('custom-design-requests').remove(uploadedPaths)
+        if (cleanupError) console.error('Could not clean up custom design images after submission failed.', cleanupError)
+      }
       setMessage(error instanceof Error ? error.message : 'Could not send your request. Please try again.')
     } finally {
       setBusy(false)
@@ -72,7 +93,7 @@ export function CustomDesignPage() {
       <header className="custom-design-header">
         <span>MADE YOUR WAY</span>
         <h1>ORDER YOUR CUSTOM DESIGN</h1>
-        <p>Share your idea and we’ll review it. Our team will contact you about availability, pricing, and next steps. Submitting a request does not place an order or charge you.</p>
+        <p>Share your idea and, if you have them, upload images of the front and back. We’ll review your request and contact you about availability, pricing, and next steps. Submitting a request does not place an order or charge you.</p>
       </header>
 
       {submitted ? (
@@ -121,13 +142,22 @@ export function CustomDesignPage() {
             </label>
           </div>
           <label className="custom-design-file">
-            DESIGN IMAGE (OPTIONAL)
+            FRONT DESIGN IMAGE (OPTIONAL)
             <input
               type="file"
               accept="image/jpeg,image/png,image/webp"
-              onChange={(event) => setDesignFile(event.target.files?.[0] ?? null)}
+              onChange={(event) => setFrontFile(event.target.files?.[0] ?? null)}
             />
-            <span>{designFile ? `${designFile.name} · ${(designFile.size / 1024 / 1024).toFixed(1)} MB` : 'JPG, PNG, or WebP · up to 5 MB'}</span>
+            <span>{frontFile ? `${frontFile.name} · ${(frontFile.size / 1024 / 1024).toFixed(1)} MB` : 'JPG, PNG, or WebP · up to 5 MB'}</span>
+          </label>
+          <label className="custom-design-file">
+            BACK DESIGN IMAGE (OPTIONAL)
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={(event) => setBackFile(event.target.files?.[0] ?? null)}
+            />
+            <span>{backFile ? `${backFile.name} · ${(backFile.size / 1024 / 1024).toFixed(1)} MB` : 'JPG, PNG, or WebP · up to 5 MB'}</span>
           </label>
           {message && <p className="custom-design-message" role="alert">{message}</p>}
           <button className="outline custom-design-submit" type="submit" disabled={busy}>
