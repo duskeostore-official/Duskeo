@@ -3,7 +3,6 @@ import { ADDED_FEEDBACK_MS } from '../../constants/site'
 import { STORAGE_KEYS } from '../../constants/storage'
 import { useAccount } from '../../context/account/useAccount'
 import { useCart } from '../../context/cart/useCart'
-import { useInventory } from '../../context/inventory/useInventory'
 import { useProductModal } from '../../context/productModal/useProductModal'
 import { supabase } from '../../lib/supabase'
 import { SizeSelector } from '../../pages/product/components/SizeSelector'
@@ -34,7 +33,6 @@ interface QuickAddSheetProps {
 /** Card "ADD TO BAG": PIN code first, then only the sizes that are in stock and deliverable there. */
 export function QuickAddSheet({ product, open, onClose }: QuickAddSheetProps) {
   const cart = useCart()
-  const inventory = useInventory()
   const modal = useProductModal()
   // Signed in with a default address: its PIN is used; otherwise the last PIN checked here.
   const defaultPin = useAccount().defaultAddress?.pincode
@@ -44,7 +42,6 @@ export function QuickAddSheet({ product, open, onClose }: QuickAddSheetProps) {
   const [checking, setChecking] = useState(false)
   const [size, setSize] = useState<Size | null>(null)
   const [status, setStatus] = useState('')
-  const [busy, setBusy] = useState(false)
 
   const check = useCallback(
     async (pin: string) => {
@@ -99,18 +96,10 @@ export function QuickAddSheet({ product, open, onClose }: QuickAddSheetProps) {
   const isAvailable = (s: Size) => !!delivery?.deliverable && delivery.sizes.some((item) => item.size === s)
   const selectedAvailability = delivery?.sizes.find((item) => item.size === size)?.available
 
-  const addToBag = async () => {
+  const addToBag = () => {
     if (!size || !isAvailable(size)) return
     if (!cart.canAdd(product.name, size)) {
       setStatus(`You already have 10 of size ${size} in your bag.`)
-      return
-    }
-    setBusy(true)
-    const taken = await inventory.take(product.name, size)
-    setBusy(false)
-    if (!taken) {
-      setStatus(`Sorry, size ${size} just sold out.`)
-      void check(pincode)
       return
     }
     cart.add(product.name, size, product.price)
@@ -134,7 +123,7 @@ export function QuickAddSheet({ product, open, onClose }: QuickAddSheetProps) {
     return `Delivers to ${pincode}${source}${place}${days}${cod}`
   }
 
-  const canAdd = !!size && isAvailable(size) && !busy
+  const canAdd = !!size && isAvailable(size)
 
   return (
     <BottomSheet
@@ -144,8 +133,8 @@ export function QuickAddSheet({ product, open, onClose }: QuickAddSheetProps) {
       onClose={onClose}
       footer={
         <div className="quick-add-actions">
-          <button type="button" className="add quick-add-submit" disabled={!canAdd} onClick={() => void addToBag()}>
-            {busy ? 'ADDING…' : size ? `ADD SIZE ${size} TO BAG +` : 'SELECT A SIZE'}
+          <button type="button" className="add quick-add-submit" disabled={!canAdd} onClick={addToBag}>
+            {size ? `ADD SIZE ${size} TO BAG +` : 'SELECT A SIZE'}
           </button>
           <button type="button" className="quick-add-details" onClick={viewDetails}>
             VIEW FULL DETAILS →

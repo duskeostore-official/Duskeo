@@ -41,24 +41,6 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
 
   const quantity = useCallback((product: string, size: Size) => stock[product]?.[size] ?? 0, [stock])
 
-  const take = useCallback(async (product: string, size: Size) => {
-    const { data, error } = await supabase.rpc('take_inventory', {
-      product_name: product,
-      size_name: size,
-    })
-    if (error || data !== true) return false
-    const next = {
-      ...stockRef.current,
-      [product]: {
-        ...stockRef.current[product],
-        [size]: Math.max(0, (stockRef.current[product]?.[size] ?? 0) - 1),
-      },
-    }
-    stockRef.current = next
-    setStock(next)
-    return true
-  }, [])
-
   const replace = useCallback(async (next: Stock) => {
     const slugs = new Map(catalog.products.map((product) => [product.name, product.slug]))
     const rows = Object.entries(next).flatMap(([name, quantities]) =>
@@ -79,8 +61,8 @@ export function InventoryProvider({ children }: { children: ReactNode }) {
   const reset = useCallback(async () => replace(zeroStock(productNames)), [productNames, replace])
 
   const value = useMemo(
-    () => ({ stock, quantity, take, replace, reset }),
-    [stock, quantity, take, replace, reset],
+    () => ({ stock, quantity, replace, reset }),
+    [stock, quantity, replace, reset],
   )
 
   return <InventoryContext.Provider value={value}>{children}</InventoryContext.Provider>
