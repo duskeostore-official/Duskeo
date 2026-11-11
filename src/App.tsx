@@ -20,6 +20,7 @@ const CampaignPage = lazy(() => import('./pages/campaign/CampaignPage').then((mo
 const CampaignCollectionPage = lazy(() => import('./pages/campaign/CampaignCollectionPage').then((module) => ({ default: module.CampaignCollectionPage })))
 const OrderDetailPage = lazy(() => import('./pages/account/OrderDetailPage').then((module) => ({ default: module.OrderDetailPage })))
 const CheckoutResultPage = lazy(() => import('./pages/checkout/CheckoutResultPage').then((module) => ({ default: module.CheckoutResultPage })))
+const CustomDesignPage = lazy(() => import('./pages/customDesign/CustomDesignPage').then((module) => ({ default: module.CustomDesignPage })))
 const OrdersPage = lazy(() => import('./pages/account/OrdersPage').then((module) => ({ default: module.OrdersPage })))
 const FaqPage = lazy(() => import('./pages/faq/FaqPage').then((module) => ({ default: module.FaqPage })))
 const PoliciesPage = lazy(() => import('./pages/policies/PoliciesPage').then((module) => ({ default: module.PoliciesPage })))
@@ -33,6 +34,8 @@ function pageTitle(route: Route, findProduct: (slug: string) => { name: string }
       return titleFor('Our Story')
     case 'faq':
       return titleFor('FAQ')
+    case 'customDesign':
+      return titleFor('Custom Design Request')
     case 'orders':
       return titleFor('My Orders')
     case 'order':
@@ -71,6 +74,8 @@ function CurrentPage({
       return <StoryPage />
     case 'faq':
       return <FaqPage />
+    case 'customDesign':
+      return <CustomDesignPage />
     case 'orders':
       return <OrdersPage onOpenProfile={onOpenProfile} />
     case 'order':

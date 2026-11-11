@@ -89,6 +89,7 @@ export type Route =
   | { view: 'product'; slug: string }
   | { view: 'policy'; policyId: string }
   | { view: 'faq' }
+  | { view: 'customDesign' }
   | { view: 'orders' }
   | { view: 'order'; orderId: number }
   | { view: 'checkoutResult'; orderId: number; state: 'success' | 'failed' | 'pending' | 'refunded' }

@@ -9,9 +9,10 @@ import type { Product, Size, Stock } from '../../types'
 import { zeroStock } from '../../utils/inventory'
 import { StorefrontAdmin } from './StorefrontAdmin'
 import { OrdersAdmin } from './OrdersAdmin'
+import { CustomDesignRequestsAdmin } from './CustomDesignRequestsAdmin'
 
 export function InventoryAdmin({ onClose }: { onClose: () => void }) {
-  const [activeSection, setActiveSection] = useState<'inventory' | 'orders'>('inventory')
+  const [activeSection, setActiveSection] = useState<'inventory' | 'orders' | 'custom-design'>('inventory')
   const inventory = useInventory()
   const catalog = useCatalog()
   const cart = useCart()
@@ -231,8 +232,16 @@ export function InventoryAdmin({ onClose }: { onClose: () => void }) {
           >
             ORDERS
           </button>
+          <button
+            type="button"
+            className={activeSection === 'custom-design' ? 'active' : ''}
+            aria-pressed={activeSection === 'custom-design'}
+            onClick={() => setActiveSection('custom-design')}
+          >
+            CUSTOM DESIGN
+          </button>
         </nav>
-        {activeSection === 'orders' ? <OrdersAdmin /> : (
+        {activeSection === 'orders' ? <OrdersAdmin /> : activeSection === 'custom-design' ? <CustomDesignRequestsAdmin /> : (
           <>
         <p className="admin-warning">
           Set the real available quantity for every product and size. Stock is saved in Supabase and shared across

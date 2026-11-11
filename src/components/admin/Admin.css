@@ -459,6 +459,64 @@
   accent-color: var(--c-text-strong);
 }
 
+.custom-requests-admin {
+  margin: 18px 0;
+}
+
+.custom-requests-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.custom-request-card {
+  border: 1px solid var(--c-border);
+  padding: 14px;
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+.custom-request-card header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.custom-request-card header > div {
+  display: grid;
+}
+
+.custom-request-card header > div > span,
+.custom-request-card p {
+  color: var(--c-text-dim);
+}
+
+.custom-request-card p {
+  margin: 8px 0 0;
+}
+
+.custom-request-card a {
+  color: var(--c-text-strong);
+}
+
+.custom-request-card select {
+  border: 1px solid var(--c-border-input);
+  background: var(--c-bg-input);
+  color: var(--c-text-strong);
+  padding: 7px;
+}
+
+.custom-request-card .custom-request-details {
+  white-space: pre-wrap;
+}
+
+@media (max-width: 560px) {
+  .inventory-admin .admin-sections {
+    flex-wrap: wrap;
+  }
+}
+
 .product-photo-upload {
   display: inline-block;
   margin-top: 12px;

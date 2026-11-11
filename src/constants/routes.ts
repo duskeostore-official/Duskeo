@@ -6,6 +6,7 @@ export const ROUTES = {
   footer: '#footer',
   ourStory: '#our-story',
   faq: '#faq',
+  customDesign: '#custom-design',
   /** Plain search (header icon, VIEW ALL). */
   search: '#search',
   /** Themed, editorial version of the search page (EXPLORE THE COLLECTION). */
