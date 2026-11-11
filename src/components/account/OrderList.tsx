@@ -16,7 +16,8 @@ export function OrderList({ limit, onNavigate }: OrderListProps) {
   const account = useAccount()
   const [cancellingId, setCancellingId] = useState<number | null>(null)
   const [cancelError, setCancelError] = useState('')
-  const visible = limit ? account.orders.slice(0, limit) : account.orders
+  const activeOrders = account.orders.filter((order) => order.status !== 'cancelled')
+  const visible = limit ? activeOrders.slice(0, limit) : activeOrders
 
   const cancelOrder = async (id: number, orderNumber: string) => {
     if (!window.confirm(`Cancel unpaid order ${orderNumber}?`)) return
@@ -32,8 +33,8 @@ export function OrderList({ limit, onNavigate }: OrderListProps) {
     }
   }
 
-  if (account.orders.length === 0) {
-    return <p className="acct-empty">{account.loading ? 'Loading…' : 'No orders yet.'}</p>
+  if (activeOrders.length === 0) {
+    return <p className="acct-empty">{account.loading ? 'Loading…' : 'No active orders.'}</p>
   }
 
   return (
@@ -71,7 +72,7 @@ export function OrderList({ limit, onNavigate }: OrderListProps) {
       {cancelError && <p className="acct-order-cancel-error" role="alert">{cancelError}</p>}
       {limit && (
         <a className="acct-view-all" href={ROUTES.orders} onClick={onNavigate}>
-          VIEW ALL ORDERS{account.orders.length > limit ? ` (${account.orders.length})` : ''} →
+          VIEW ALL ORDERS{activeOrders.length > limit ? ` (${activeOrders.length})` : ''} →
         </a>
       )}
     </>
