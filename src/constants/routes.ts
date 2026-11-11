@@ -2,6 +2,7 @@
 export const ROUTES = {
   home: '#home',
   top: '#top',
+  women: '#women',
   collection: '#collection',
   footer: '#footer',
   ourStory: '#our-story',

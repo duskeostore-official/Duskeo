@@ -13,6 +13,7 @@ import { STORE_COLLECTIONS } from './data/campaignCollections'
 import { POLICIES } from './data/policies'
 import { useHashRoute } from './hooks/useHashRoute'
 import { HomePage } from './pages/home/HomePage'
+import './pages/home/WomenComingSoon.css'
 import type { Product, Route } from './types'
 
 const AddressesPage = lazy(() => import('./pages/account/AddressesPage').then((module) => ({ default: module.AddressesPage })))
@@ -32,6 +33,8 @@ function pageTitle(route: Route, findProduct: (slug: string) => { name: string }
   switch (route.view) {
     case 'story':
       return titleFor('Our Story')
+    case 'women':
+      return titleFor("Women's Collection — Coming Soon")
     case 'faq':
       return titleFor('FAQ')
     case 'customDesign':
@@ -72,6 +75,16 @@ function CurrentPage({
   switch (route.view) {
     case 'story':
       return <StoryPage />
+    case 'women':
+      return <main className="women-coming-soon">
+        <div>
+          <span className="page-kicker">DUSKEO WOMEN</span>
+          <h1>THE WOMEN’S COLLECTION</h1>
+          <p>Something new is on its way.</p>
+          <span className="women-coming-soon-label">COMING SOON</span>
+          <a className="outline" href={ROUTES.top}>BACK TO MEN’S COLLECTION</a>
+        </div>
+      </main>
     case 'faq':
       return <FaqPage />
     case 'customDesign':

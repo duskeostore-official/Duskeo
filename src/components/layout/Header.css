@@ -16,6 +16,29 @@
   gap: 24px;
 }
 
+.store-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--c-border-muted);
+  border-radius: 999px;
+  font-size: 9px;
+  letter-spacing: 0.12em;
+  white-space: nowrap;
+}
+
+.store-switch a {
+  padding: 7px 9px;
+  border-radius: 999px;
+  color: var(--c-text-dim);
+}
+
+.store-switch a[aria-current='page'] {
+  background: var(--c-text-strong);
+  color: var(--c-bg);
+}
+
 .nav {
   display: flex;
   align-items: center;
@@ -122,6 +145,7 @@
 
   /* Phone: SHOP and the theme switch move into the ☰ menu (MobileMenu). */
   .leftnav > .nav,
+  .leftnav > .store-switch,
   .nav.right .theme-toggle {
     display: none;
   }

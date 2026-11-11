@@ -72,6 +72,25 @@
   mask-image: linear-gradient(to bottom, #000 calc(100% - 28px), transparent);
 }
 
+.mmenu-store-switch {
+  display: grid;
+  gap: 8px;
+  margin: 8px 0 16px;
+}
+
+.mmenu-store-switch a {
+  display: block;
+  border: 1px solid var(--c-border-muted);
+  padding: 12px;
+  font-size: 10px;
+  letter-spacing: 0.16em;
+}
+
+.mmenu-store-switch a[aria-current='page'] {
+  border-color: var(--c-text-strong);
+  color: var(--c-text-strong);
+}
+
 .mmenu-body::-webkit-scrollbar {
   width: 4px;
 }

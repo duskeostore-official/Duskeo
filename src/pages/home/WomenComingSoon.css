@@ -1,0 +1,45 @@
+.women-coming-soon {
+  display: grid;
+  min-height: var(--screen-h);
+  place-items: center;
+  padding: 48px 24px;
+  text-align: center;
+  background:
+    radial-gradient(ellipse at center, rgba(var(--c-shade-rgb), 0.06), transparent 68%),
+    var(--c-bg);
+}
+
+.women-coming-soon > div {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.women-coming-soon h1 {
+  margin: 18px 0 12px;
+  font-size: clamp(24px, 5vw, 46px);
+  font-weight: 400;
+  letter-spacing: 0.15em;
+}
+
+.women-coming-soon p {
+  margin: 0;
+  color: var(--c-text-dim);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+}
+
+.women-coming-soon-label {
+  margin: 30px 0;
+  border-top: 1px solid var(--c-border-muted);
+  border-bottom: 1px solid var(--c-border-muted);
+  padding: 11px 20px;
+  font-size: 10px;
+  letter-spacing: 0.28em;
+}
+
+.women-coming-soon .outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}

@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { AccountSections } from '../account/AccountSections'
+import { ROUTES } from '../../constants/routes'
 import './MobileMenu.css'
 
 interface MobileMenuProps {
@@ -11,6 +12,8 @@ interface MobileMenuProps {
 
 /** Phone menu (☰): slides in from the left with the account sections stacked vertically. */
 export function MobileMenu({ open, onClose, onOpenProfile }: MobileMenuProps) {
+  const womenActive = window.location.hash.toLowerCase() === ROUTES.women
+
   useEffect(() => {
     if (!open) return
     const html = document.documentElement
@@ -39,6 +42,10 @@ export function MobileMenu({ open, onClose, onOpenProfile }: MobileMenuProps) {
           </button>
         </div>
         <div className="mmenu-body">
+          <nav className="mmenu-store-switch" aria-label="Shop by collection">
+            <a href={ROUTES.top} onClick={onClose} aria-current={!womenActive ? 'page' : undefined}>MEN</a>
+            <a href={ROUTES.women} onClick={onClose} aria-current={womenActive ? 'page' : undefined}>WOMEN · COMING SOON</a>
+          </nav>
           <AccountSections onSignIn={signIn} onNavigate={onClose} />
         </div>
       </aside>

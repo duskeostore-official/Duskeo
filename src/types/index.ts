@@ -83,6 +83,7 @@ export interface SearchFilters {
 
 export type Route =
   | { view: 'home'; anchor?: string }
+  | { view: 'women' }
   | { view: 'campaign'; slug: string }
   | { view: 'search'; query: string; mode: SearchMode }
   | { view: 'story' }

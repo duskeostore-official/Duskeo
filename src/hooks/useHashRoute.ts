@@ -10,6 +10,7 @@ const currentHash = () => window.location.hash
 /** Maps a location hash to the view it should show (same rules as the original site). */
 export function parseRoute(hash: string, products: Product[] = []): Route {
   const lower = hash.toLowerCase()
+  if (lower === ROUTES.women) return { view: 'women' }
   if (lower === ROUTES.ourStory) return { view: 'story' }
   if (lower === ROUTES.faq) return { view: 'faq' }
   if (lower === ROUTES.customDesign) return { view: 'customDesign' }

@@ -16,6 +16,7 @@ export function Header({ onOpenProfile }: HeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false)
   const closeMenu = useCallback(() => setMenuOpen(false), [])
   const cart = useCart()
+  const womenActive = window.location.hash.toLowerCase() === ROUTES.women
 
   return (
     <header className="header">
@@ -25,6 +26,10 @@ export function Header({ onOpenProfile }: HeaderProps) {
         </button>
         <nav className="nav">
           <a href={ROUTES.collection}>SHOP</a>
+        </nav>
+        <nav className={`store-switch${womenActive ? ' women-active' : ''}`} aria-label="Shop by collection">
+          <a href={ROUTES.top} aria-current={!womenActive ? 'page' : undefined}>MEN</a>
+          <a href={ROUTES.women} aria-current={womenActive ? 'page' : undefined}>WOMEN</a>
         </nav>
       </div>
       <MobileMenu open={menuOpen} onClose={closeMenu} onOpenProfile={onOpenProfile} />
