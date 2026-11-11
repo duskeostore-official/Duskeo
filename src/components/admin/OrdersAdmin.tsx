@@ -3,6 +3,7 @@ import { BRAND_NAME, CONTACT_EMAIL } from '../../constants/site'
 import { supabase } from '../../lib/supabase'
 import { formatDateTime, ITEM_STATUS, ORDER_STATUS } from '../../utils/orders'
 import { rupees } from '../../utils/format'
+import { validateShippingPackage, type PackagePresetKey, type ShippingPackage, type ShippingPackagePreset } from '../../utils/shippingPackages'
 
 interface AdminOrder {
   id: number
@@ -39,6 +40,17 @@ interface AdminOrderItem {
   status: string
 }
 
+interface OrderShippingPackage {
+  order_id: number
+  warehouse_id: number
+  package_preset_key: PackagePresetKey
+  item_quantity: number
+  weight_grams: number
+  length_cm: number
+  width_cm: number
+  height_cm: number
+}
+
 type ShipmentStatus = 'created' | 'picked_up' | 'in_transit' | 'out_for_delivery' | 'delivered' | 'lost'
 
 interface AdminShipment {
@@ -47,6 +59,13 @@ interface AdminShipment {
   courier: string | null
   awb_number: string | null
   tracking_url: string | null
+  package_preset_key: string | null
+  package_weight_grams: number | null
+  package_length_cm: number | null
+  package_width_cm: number | null
+  package_height_cm: number | null
+  package_overridden: boolean
+  nimbuspost_order_id: string | null
   status: ShipmentStatus
   created_at: string
 }
@@ -54,7 +73,7 @@ interface AdminShipment {
 const PAGE_SIZE = 25
 const ORDER_COLUMNS = 'id, order_number, status, payment_method, shipping_address, item_count, total_mrp_paise, product_discount_paise, coupon_code, coupon_discount_paise, shipping_fee_paise, cod_fee_paise, platform_fee_paise, store_credit_used_paise, tax_paise, total_paise, created_at'
 const ITEM_COLUMNS = 'id, order_id, warehouse_id, shipment_id, title, sku, size_label, color_name, quantity, unit_price_paise, line_total_paise, status'
-const SHIPMENT_COLUMNS = 'id, order_id, courier, awb_number, tracking_url, status, created_at'
+const SHIPMENT_COLUMNS = 'id, order_id, courier, awb_number, tracking_url, package_preset_key, package_weight_grams, package_length_cm, package_width_cm, package_height_cm, package_overridden, nimbuspost_order_id, status, created_at'
 const NEXT_SHIPMENT_STATUSES: Partial<Record<ShipmentStatus, ShipmentStatus[]>> = {
   created: ['picked_up'],
   picked_up: ['in_transit', 'out_for_delivery'],
@@ -65,7 +84,10 @@ const NEXT_SHIPMENT_STATUSES: Partial<Record<ShipmentStatus, ShipmentStatus[]>> 
 export function OrdersAdmin() {
   const [orders, setOrders] = useState<AdminOrder[]>([])
   const [items, setItems] = useState<AdminOrderItem[]>([])
+  const [orderPackages, setOrderPackages] = useState<OrderShippingPackage[]>([])
   const [shipments, setShipments] = useState<AdminShipment[]>([])
+  const [packagePresets, setPackagePresets] = useState<ShippingPackagePreset[]>([])
+  const [expandedOrderIds, setExpandedOrderIds] = useState<Set<number>>(() => new Set())
   const [query, setQuery] = useState('')
   const [page, setPage] = useState(0)
   const [totalOrders, setTotalOrders] = useState(0)
@@ -84,6 +106,18 @@ export function OrdersAdmin() {
     setError('')
     if (refresh) setRefreshing(true)
     else setLoading(true)
+
+    const { data: presetRows, error: presetError } = await supabase
+      .from('shipping_package_presets')
+      .select('preset_key, label, min_quantity, max_quantity, weight_grams, length_cm, width_cm, height_cm')
+      .order('min_quantity')
+    if (presetError) {
+      setError(`Could not load shipping package settings: ${presetError.message}`)
+      setLoading(false)
+      setRefreshing(false)
+      return
+    }
+    setPackagePresets((presetRows ?? []) as ShippingPackagePreset[])
 
     const term = query.trim().replace(/[,().%_*\\"]/g, '')
     let orderQuery = supabase
@@ -112,11 +146,15 @@ export function OrdersAdmin() {
     const orderIds = loadedOrders.map((order) => order.id)
     let loadedItems: AdminOrderItem[] = []
     let loadedShipments: AdminShipment[] = []
+    let loadedPackages: OrderShippingPackage[] = []
 
     if (orderIds.length) {
-      const [itemResult, shipmentResult] = await Promise.all([
+      const [itemResult, shipmentResult, packageResult] = await Promise.all([
         supabase.from('order_items').select(ITEM_COLUMNS).in('order_id', orderIds).order('id'),
         supabase.from('shipments').select(SHIPMENT_COLUMNS).in('order_id', orderIds).order('created_at'),
+        supabase.from('order_shipping_packages')
+          .select('order_id, warehouse_id, package_preset_key, item_quantity, weight_grams, length_cm, width_cm, height_cm')
+          .in('order_id', orderIds),
       ])
 
       if (itemResult.error) {
@@ -131,14 +169,22 @@ export function OrdersAdmin() {
         setRefreshing(false)
         return
       }
+      if (packageResult.error) {
+        setError(`Orders loaded, but their saved package presets could not be loaded: ${packageResult.error.message}`)
+        setLoading(false)
+        setRefreshing(false)
+        return
+      }
 
       loadedItems = (itemResult.data ?? []) as AdminOrderItem[]
       loadedShipments = (shipmentResult.data ?? []) as AdminShipment[]
+      loadedPackages = (packageResult.data ?? []) as OrderShippingPackage[]
     }
 
     setOrders(loadedOrders)
     setItems(loadedItems)
     setShipments(loadedShipments)
+    setOrderPackages(loadedPackages)
     setTotalOrders(count ?? 0)
     setLoading(false)
     setRefreshing(false)
@@ -161,32 +207,11 @@ export function OrdersAdmin() {
     return grouped
   }, [shipments])
 
-  const createShipment = async (orderId: number, itemIds: number[], courier: string, awb: string, trackingUrl: string) => {
-    const cleanCourier = courier.trim()
-    const cleanAwb = awb.trim()
-    const cleanTrackingUrl = trackingUrl.trim()
-    if (!cleanCourier || !cleanAwb) {
-      setError('Enter both courier and tracking number before packing a shipment.')
-      return
-    }
-    if (cleanTrackingUrl && !/^https?:\/\/\S+$/i.test(cleanTrackingUrl)) {
-      setError('Enter a valid http or https tracking URL.')
-      return
-    }
-    setError('')
-    const { error: createError } = await supabase.rpc('create_shipment', {
-      p_order_id: orderId,
-      p_item_ids: itemIds,
-      p_courier: cleanCourier,
-      p_awb: cleanAwb,
-      p_tracking_url: cleanTrackingUrl || null,
-    })
-    if (createError) {
-      setError(`Could not create shipment: ${createError.message}`)
-      return
-    }
-    await loadOrders(true)
-  }
+  const packageByOrderWarehouse = useMemo(() => {
+    const packages = new Map<string, OrderShippingPackage>()
+    orderPackages.forEach((item) => packages.set(`${item.order_id}-${item.warehouse_id}`, item))
+    return packages
+  }, [orderPackages])
 
   const saveTracking = async (shipmentId: number, courier: string, awb: string, trackingUrl: string) => {
     const cleanCourier = courier.trim()
@@ -264,12 +289,25 @@ export function OrdersAdmin() {
             const address = order.shipping_address
             const orderItems = itemsByOrder.get(order.id) ?? []
             const orderShipments = shipmentsByOrder.get(order.id) ?? []
+            const orderExpanded = expandedOrderIds.has(order.id)
             const unshippedGroups = new Map<number, AdminOrderItem[]>()
             orderItems
               .filter((item) => item.status === 'placed' && item.shipment_id === null)
               .forEach((item) => unshippedGroups.set(item.warehouse_id, [...(unshippedGroups.get(item.warehouse_id) ?? []), item]))
             return (
-              <details className="orders-admin-card" key={order.id}>
+              <details
+                className="orders-admin-card"
+                key={order.id}
+                onToggle={(event) => {
+                  const expanded = event.currentTarget.open
+                  setExpandedOrderIds((current) => {
+                    const next = new Set(current)
+                    if (expanded) next.add(order.id)
+                    else next.delete(order.id)
+                    return next
+                  })
+                }}
+              >
                 <summary>
                   <span className="orders-admin-number">{order.order_number}</span>
                   <span>{address.name || 'Customer'}</span>
@@ -296,16 +334,18 @@ export function OrdersAdmin() {
                     )) : <span className="orders-admin-message">No item details available.</span>}
                   </div>
                 </div>
-                {(unshippedGroups.size > 0 || orderShipments.length > 0) && (
+                {orderExpanded && (unshippedGroups.size > 0 || orderShipments.length > 0) && (
                   <div className="orders-admin-fulfillment">
                     <strong>FULFILLMENT & TRACKING</strong>
                     {[...unshippedGroups.entries()].map(([warehouseId, warehouseItems]) => (
                       <div key={`${order.id}-${warehouseId}`}>
-                        <NimbusPostRateCheck orderId={order.id} items={warehouseItems} />
-                        <CreateShipmentForm
-                          warehouseId={warehouseId}
+                        <NimbusPostFulfillment
+                          key={`${warehouseId}-${warehouseItems.map((item) => item.id).join('-')}`}
+                          orderId={order.id}
+                          packageDefault={packageByOrderWarehouse.get(`${order.id}-${warehouseId}`) ?? null}
+                          presetLabel={packagePresets.find((preset) => preset.preset_key === packageByOrderWarehouse.get(`${order.id}-${warehouseId}`)?.package_preset_key)?.label ?? 'PACKAGE PRESET'}
                           items={warehouseItems}
-                          onCreate={(courier, awb, url) => createShipment(order.id, warehouseItems.map((item) => item.id), courier, awb, url)}
+                          onCreated={() => loadOrders(true)}
                         />
                       </div>
                     ))}
@@ -394,30 +434,52 @@ export function OrdersAdmin() {
   )
 }
 
-function NimbusPostRateCheck({ orderId, items }: { orderId: number; items: AdminOrderItem[] }) {
-  const [weightGrams, setWeightGrams] = useState('499')
-  const [lengthCm, setLengthCm] = useState('30')
-  const [widthCm, setWidthCm] = useState('25')
-  const [heightCm, setHeightCm] = useState('5')
+function NimbusPostFulfillment({
+  orderId,
+  packageDefault,
+  presetLabel,
+  items,
+  onCreated,
+}: {
+  orderId: number
+  packageDefault: OrderShippingPackage | null
+  presetLabel: string
+  items: AdminOrderItem[]
+  onCreated: () => Promise<void>
+}) {
+  const quantity = packageDefault?.item_quantity ?? items.reduce((total, item) => total + item.quantity, 0)
+  const itemIdsKey = items.map((item) => item.id).join(',')
+  const itemIds = itemIdsKey ? itemIdsKey.split(',').map(Number) : []
+  const [parcel, setParcel] = useState<ShippingPackage | null>(() => packageDefault ? {
+    weightGrams: packageDefault.weight_grams,
+    lengthCm: Number(packageDefault.length_cm),
+    widthCm: Number(packageDefault.width_cm),
+    heightCm: Number(packageDefault.height_cm),
+  } : null)
   const [busy, setBusy] = useState(false)
+  const [booking, setBooking] = useState(false)
   const [error, setError] = useState('')
   const [result, setResult] = useState('')
+  const [bookingResult, setBookingResult] = useState('')
+  const [ratedParcel, setRatedParcel] = useState<ShippingPackage | null>(null)
+  const [booked, setBooked] = useState(false)
+  const [bookingLocked, setBookingLocked] = useState(false)
   const autoCheckStarted = useRef(false)
 
   const checkRates = useCallback(async () => {
+    if (!packageDefault || !parcel || !validateShippingPackage(parcel)) {
+      setError('Shipping package settings are unavailable or invalid.')
+      return
+    }
     setBusy(true)
     setError('')
     setResult('')
+    setRatedParcel(null)
     const { data, error: invokeError } = await supabase.functions.invoke('nimbuspost-serviceability', {
       body: {
         orderId,
-        itemIds: items.map((item) => item.id),
-        parcel: {
-          weightGrams: Number(weightGrams),
-          lengthCm: Number(lengthCm),
-          widthCm: Number(widthCm),
-          heightCm: Number(heightCm),
-        },
+        itemIds: itemIdsKey.split(',').map(Number),
+        parcel,
       },
     })
     setBusy(false)
@@ -430,7 +492,8 @@ function NimbusPostRateCheck({ orderId, items }: { orderId: number; items: Admin
       return
     }
     setResult(JSON.stringify(data?.result ?? data, null, 2))
-  }, [heightCm, items, lengthCm, orderId, weightGrams, widthCm])
+    setRatedParcel(parcel)
+  }, [itemIdsKey, orderId, packageDefault, parcel])
 
   useEffect(() => {
     if (autoCheckStarted.current) return
@@ -438,57 +501,79 @@ function NimbusPostRateCheck({ orderId, items }: { orderId: number; items: Admin
     void checkRates()
   }, [checkRates])
 
-  return (
-    <div className="orders-admin-shipment-form orders-admin-rate-check">
-      <strong>CHECK NIMBUSPOST RATES · WAREHOUSE {items[0]?.warehouse_id}</strong>
-      <span>Rates are checked automatically using a 499 g, 30 × 25 × 5 cm parcel. Adjust for larger or multiple-item orders; this never books a courier or pickup.</span>
-      <div>
-        <input aria-label={`Parcel weight in grams for order ${orderId}`} type="number" min="1" max="50000" step="1" value={weightGrams} onChange={(event) => setWeightGrams(event.target.value)} placeholder="Weight (g)" />
-        <input aria-label={`Parcel length in cm for order ${orderId}`} type="number" min="1" max="200" step="0.1" value={lengthCm} onChange={(event) => setLengthCm(event.target.value)} placeholder="Length (cm)" />
-        <input aria-label={`Parcel width in cm for order ${orderId}`} type="number" min="1" max="200" step="0.1" value={widthCm} onChange={(event) => setWidthCm(event.target.value)} placeholder="Width (cm)" />
-        <input aria-label={`Parcel height in cm for order ${orderId}`} type="number" min="1" max="200" step="0.1" value={heightCm} onChange={(event) => setHeightCm(event.target.value)} placeholder="Height (cm)" />
-        <button type="button" disabled={busy || !weightGrams || !lengthCm || !widthCm || !heightCm} onClick={() => void checkRates()}>
-          {busy ? 'CHECKING…' : 'RECHECK RATES'}
-        </button>
+  const createNimbusPostShipment = async () => {
+    if (!ratedParcel || !parcel || JSON.stringify(ratedParcel) !== JSON.stringify(parcel) || !packageDefault) {
+      setError('Recheck rates after changing package details before booking.')
+      return
+    }
+    if (!window.confirm('This will create and book a real NimbusPost courier shipment and may charge your NimbusPost wallet. Continue?')) return
+
+    setBookingLocked(true)
+    setBooking(true)
+    setError('')
+    setBookingResult('')
+    const { data, error: invokeError } = await supabase.functions.invoke('nimbuspost-create-shipment', {
+      body: { orderId, itemIds, parcel: ratedParcel },
+    })
+    setBooking(false)
+    if (invokeError) {
+      setError(invokeError.message)
+      return
+    }
+    if (data?.error) {
+      setError(String(data.error))
+      return
+    }
+    setBooked(true)
+    setBookingResult(JSON.stringify(data?.booking ?? data, null, 2))
+    await onCreated()
+  }
+
+  const updateParcel = (field: keyof ShippingPackage, value: string) => {
+    setParcel((current) => current ? { ...current, [field]: value === '' ? Number.NaN : Number(value) } : current)
+    setRatedParcel(null)
+    setResult('')
+  }
+  const resetParcel = () => {
+    if (!packageDefault) return
+    setParcel({
+      weightGrams: packageDefault.weight_grams,
+      lengthCm: Number(packageDefault.length_cm),
+      widthCm: Number(packageDefault.width_cm),
+      heightCm: Number(packageDefault.height_cm),
+    })
+    setRatedParcel(null)
+  }
+
+  if (!packageDefault || !parcel) {
+    return (
+      <div className="orders-admin-shipment-form">
+        <strong>NIMBUSPOST PACKAGE · WAREHOUSE {items[0]?.warehouse_id}</strong>
+        <span className="orders-admin-error">Shipping presets are unavailable. Configure all three presets in Shipping Package Settings.</span>
       </div>
-      {error && <span className="orders-admin-error" role="alert">{error}</span>}
-      {result && <pre className="orders-admin-rate-result" role="status">{result}</pre>}
-    </div>
-  )
-}
-
-function CreateShipmentForm({
-  warehouseId,
-  items,
-  onCreate,
-}: {
-  warehouseId: number
-  items: AdminOrderItem[]
-  onCreate: (courier: string, awb: string, trackingUrl: string) => Promise<void>
-}) {
-  const [courier, setCourier] = useState('')
-  const [awb, setAwb] = useState('')
-  const [trackingUrl, setTrackingUrl] = useState('')
-  const [busy, setBusy] = useState(false)
-
-  const submit = async () => {
-    setBusy(true)
-    await onCreate(courier, awb, trackingUrl)
-    setBusy(false)
+    )
   }
 
   return (
-    <div className="orders-admin-shipment-form">
-      <strong>PACK {items.length} ITEM{items.length === 1 ? '' : 'S'} · WAREHOUSE {warehouseId}</strong>
-      <span>{items.map((item) => `${item.title} (${item.size_label}) ×${item.quantity}`).join(', ')}</span>
+    <div className="orders-admin-shipment-form orders-admin-rate-check">
+      <strong>NIMBUSPOST · {presetLabel.toUpperCase()} · {quantity} T-SHIRT{quantity === 1 ? '' : 'S'} · WAREHOUSE {items[0]?.warehouse_id}</strong>
+      <span>Rates are checked automatically with the selected preset. Edit only for exceptional parcels. Booking requires confirmation and may charge your NimbusPost wallet.</span>
       <div>
-        <input aria-label={`Courier for warehouse ${warehouseId}`} value={courier} onChange={(event) => setCourier(event.target.value)} placeholder="Courier" />
-        <input aria-label={`Tracking number for warehouse ${warehouseId}`} value={awb} onChange={(event) => setAwb(event.target.value)} placeholder="Tracking / AWB number" />
-        <input aria-label={`Tracking URL for warehouse ${warehouseId}`} value={trackingUrl} onChange={(event) => setTrackingUrl(event.target.value)} placeholder="Tracking URL (optional)" />
-        <button type="button" disabled={busy || !courier.trim() || !awb.trim()} onClick={() => void submit()}>
-          {busy ? 'PACKING…' : 'CREATE SHIPMENT'}
+        <label>WEIGHT (G)<input aria-label={`Parcel weight for order ${orderId}`} type="number" min="1" max="50000" step="1" value={Number.isFinite(parcel.weightGrams) ? parcel.weightGrams : ''} onChange={(event) => updateParcel('weightGrams', event.target.value)} /></label>
+        <label>LENGTH (CM)<input aria-label={`Parcel length for order ${orderId}`} type="number" min="0.5" max="200" step="0.1" value={Number.isFinite(parcel.lengthCm) ? parcel.lengthCm : ''} onChange={(event) => updateParcel('lengthCm', event.target.value)} /></label>
+        <label>WIDTH (CM)<input aria-label={`Parcel width for order ${orderId}`} type="number" min="0.5" max="200" step="0.1" value={Number.isFinite(parcel.widthCm) ? parcel.widthCm : ''} onChange={(event) => updateParcel('widthCm', event.target.value)} /></label>
+        <label>HEIGHT (CM)<input aria-label={`Parcel height for order ${orderId}`} type="number" min="0.5" max="200" step="0.1" value={Number.isFinite(parcel.heightCm) ? parcel.heightCm : ''} onChange={(event) => updateParcel('heightCm', event.target.value)} /></label>
+        <button type="button" disabled={busy || !validateShippingPackage(parcel)} onClick={() => void checkRates()}>
+          {busy ? 'CHECKING…' : 'RECHECK RATES'}
         </button>
+        <button type="button" disabled={busy || booking || bookingLocked || booked || !ratedParcel || JSON.stringify(ratedParcel) !== JSON.stringify(parcel)} onClick={() => void createNimbusPostShipment()}>
+          {booking ? 'BOOKING…' : booked ? 'SHIPMENT BOOKED' : bookingLocked ? 'BOOKING REQUEST SENT' : 'BOOK NIMBUSPOST COURIER'}
+        </button>
+        <button type="button" disabled={busy || booking} onClick={resetParcel}>RESET TO PRESET</button>
       </div>
+      {error && <span className="orders-admin-error" role="alert">{error}</span>}
+      {result && <pre className="orders-admin-rate-result" role="status">{result}</pre>}
+      {bookingResult && <pre className="orders-admin-rate-result" role="status">{bookingResult}</pre>}
     </div>
   )
 }
@@ -526,6 +611,13 @@ function ShipmentEditor({
   return (
     <div className="orders-admin-shipment-form">
       <strong>SHIPMENT #{shipment.id} · {shipment.status.replaceAll('_', ' ').toUpperCase()}</strong>
+      {shipment.package_weight_grams !== null && (
+        <span>
+          Package: {shipment.package_weight_grams} g · {shipment.package_length_cm} × {shipment.package_width_cm} × {shipment.package_height_cm} cm
+          {shipment.package_overridden ? ' · order override' : shipment.package_preset_key ? ` · ${shipment.package_preset_key.replaceAll('_', ' ')}` : ''}
+          {shipment.nimbuspost_order_id ? ` · NimbusPost ${shipment.nimbuspost_order_id}` : ''}
+        </span>
+      )}
       <div>
         <input aria-label={`Courier for shipment ${shipment.id}`} value={courier} onChange={(event) => setCourier(event.target.value)} placeholder="Courier" />
         <input aria-label={`Tracking number for shipment ${shipment.id}`} value={awb} onChange={(event) => setAwb(event.target.value)} placeholder="Tracking / AWB number" />

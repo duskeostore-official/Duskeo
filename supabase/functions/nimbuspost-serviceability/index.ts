@@ -1,4 +1,5 @@
 import { createClient } from 'npm:@supabase/supabase-js@2'
+import { hasPackageOverride, isValidParcel, type Parcel } from '../_shared/shipping-packages.ts'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -13,6 +14,18 @@ const json = (body: Record<string, unknown>, status = 200) =>
   })
 
 const validPincode = (value: string) => /^[1-9]\d{5}$/.test(value)
+
+const parseParcel = (value: unknown): Parcel | null => {
+  if (!value || typeof value !== 'object') return null
+  const parcel = value as Record<string, unknown>
+  const parsed = {
+    weightGrams: Number(parcel.weightGrams),
+    lengthCm: Number(parcel.lengthCm),
+    widthCm: Number(parcel.widthCm),
+    heightCm: Number(parcel.heightCm),
+  }
+  return isValidParcel(parsed) ? parsed : null
+}
 
 Deno.serve(async (request) => {
   if (request.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders })
@@ -37,18 +50,9 @@ Deno.serve(async (request) => {
 
   let orderId: number
   let itemIds: number[]
-  let parcel: { weightGrams: number; lengthCm: number; widthCm: number; heightCm: number }
+  let parcelOverride: Parcel | null
   try {
-    const body = await request.json() as {
-      orderId?: unknown
-      itemIds?: unknown
-      parcel?: {
-        weightGrams?: unknown
-        lengthCm?: unknown
-        widthCm?: unknown
-        heightCm?: unknown
-      }
-    }
+    const body = await request.json() as { orderId?: unknown; itemIds?: unknown; parcel?: unknown }
     orderId = Number(body.orderId)
     if (!Array.isArray(body.itemIds) || body.itemIds.length === 0 || body.itemIds.length > 50) {
       return json({ error: 'Select at least one unshipped order item.' }, 400)
@@ -57,16 +61,10 @@ Deno.serve(async (request) => {
     if (itemIds.some((id) => !Number.isSafeInteger(id) || id <= 0) || new Set(itemIds).size !== itemIds.length) {
       return json({ error: 'Invalid order item selection.' }, 400)
     }
-    const weightGrams = Number(body.parcel?.weightGrams)
-    const lengthCm = Number(body.parcel?.lengthCm)
-    const widthCm = Number(body.parcel?.widthCm)
-    const heightCm = Number(body.parcel?.heightCm)
-    if (![weightGrams, lengthCm, widthCm, heightCm].every(Number.isFinite)
-      || weightGrams <= 0 || weightGrams > 50000
-      || [lengthCm, widthCm, heightCm].some((value) => value <= 0 || value > 200)) {
+    parcelOverride = body.parcel === undefined ? null : parseParcel(body.parcel)
+    if (body.parcel !== undefined && !parcelOverride) {
       return json({ error: 'Enter valid parcel weight and dimensions.' }, 400)
     }
-    parcel = { weightGrams, lengthCm, widthCm, heightCm }
   } catch {
     return json({ error: 'Invalid NimbusPost rate-check request.' }, 400)
   }
@@ -88,7 +86,7 @@ Deno.serve(async (request) => {
   const serviceClient = createClient(supabaseUrl, serviceRoleKey, {
     auth: { autoRefreshToken: false, persistSession: false },
   })
-  const [{ data: order, error: orderError }, { data: items, error: itemsError }] = await Promise.all([
+  const [{ data: order, error: orderError }, { data: items, error: itemsError }, { data: packages, error: packagesError }] = await Promise.all([
     serviceClient
       .from('orders')
       .select('id, status, payment_method, shipping_pincode')
@@ -96,17 +94,22 @@ Deno.serve(async (request) => {
       .maybeSingle(),
     serviceClient
       .from('order_items')
-      .select('id, warehouse_id, line_total_paise, status, shipment_id')
+      .select('id, warehouse_id, line_total_paise, status, shipment_id, quantity')
       .eq('order_id', orderId)
       .in('id', itemIds),
+    serviceClient
+      .from('order_shipping_packages')
+      .select('warehouse_id, package_preset_key, item_quantity, weight_grams, length_cm, width_cm, height_cm')
+      .eq('order_id', orderId),
   ])
-  if (orderError || itemsError) {
-    console.error('NimbusPost rate check could not load order details.', {
+  if (orderError || itemsError || packagesError) {
+    console.error('NimbusPost rate check could not load order or package details.', {
       orderId,
       orderError: orderError?.message,
       itemsError: itemsError?.message,
+      packagesError: packagesError?.message,
     })
-    return json({ error: 'Could not load the order for rate checking.' }, 500)
+    return json({ error: 'Could not load the order or shipping package settings.' }, 500)
   }
   if (!order || order.status !== 'placed') return json({ error: 'Only placed orders can be rate checked.' }, 409)
   if (!items || items.length !== itemIds.length
@@ -114,6 +117,20 @@ Deno.serve(async (request) => {
     || new Set(items.map((item) => item.warehouse_id)).size !== 1) {
     return json({ error: 'Selected items must be unshipped items from the same warehouse.' }, 409)
   }
+  const quantity = items.reduce((total, item) => total + item.quantity, 0)
+  const orderPackage = (packages ?? []).find((item) => item.warehouse_id === items[0].warehouse_id)
+  if (!orderPackage || orderPackage.item_quantity < quantity) {
+    return json({ error: 'This order does not have a matching package preset. Refresh the order or contact support.' }, 409)
+  }
+  const defaultParcel: Parcel = {
+    weightGrams: orderPackage.weight_grams,
+    lengthCm: Number(orderPackage.length_cm),
+    widthCm: Number(orderPackage.width_cm),
+    heightCm: Number(orderPackage.height_cm),
+  }
+  if (!isValidParcel(defaultParcel)) return json({ error: 'The saved package preset is invalid.' }, 500)
+  const parcel = parcelOverride ?? defaultParcel
+
   const deliveryPincode = String(order.shipping_pincode).trim()
   if (!validPincode(deliveryPincode)) return json({ error: 'The order has an invalid delivery pincode.' }, 400)
 
@@ -155,5 +172,11 @@ Deno.serve(async (request) => {
     console.error('NimbusPost serviceability request was rejected.', { orderId, status: upstream.status })
     return json({ error: 'NimbusPost could not calculate rates for this parcel.' }, 502)
   }
-  return json({ result })
+  return json({
+    result,
+    package: parcel,
+    preset: { key: orderPackage.package_preset_key },
+    quantity,
+    packageOverridden: hasPackageOverride(parcel, defaultParcel),
+  })
 })

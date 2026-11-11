@@ -3,3 +3,6 @@ verify_jwt = false
 
 [functions.nimbuspost-serviceability]
 verify_jwt = true
+
+[functions.nimbuspost-create-shipment]
+verify_jwt = true

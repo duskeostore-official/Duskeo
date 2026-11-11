@@ -10,9 +10,10 @@ import { zeroStock } from '../../utils/inventory'
 import { StorefrontAdmin } from './StorefrontAdmin'
 import { OrdersAdmin } from './OrdersAdmin'
 import { CustomDesignRequestsAdmin } from './CustomDesignRequestsAdmin'
+import { ShippingPackageSettings } from './ShippingPackageSettings'
 
 export function InventoryAdmin({ onClose }: { onClose: () => void }) {
-  const [activeSection, setActiveSection] = useState<'inventory' | 'orders' | 'custom-design'>('inventory')
+  const [activeSection, setActiveSection] = useState<'inventory' | 'orders' | 'shipping' | 'custom-design'>('inventory')
   const inventory = useInventory()
   const catalog = useCatalog()
   const cart = useCart()
@@ -234,6 +235,14 @@ export function InventoryAdmin({ onClose }: { onClose: () => void }) {
           </button>
           <button
             type="button"
+            className={activeSection === 'shipping' ? 'active' : ''}
+            aria-pressed={activeSection === 'shipping'}
+            onClick={() => setActiveSection('shipping')}
+          >
+            SHIPPING PACKAGES
+          </button>
+          <button
+            type="button"
             className={activeSection === 'custom-design' ? 'active' : ''}
             aria-pressed={activeSection === 'custom-design'}
             onClick={() => setActiveSection('custom-design')}
@@ -241,7 +250,7 @@ export function InventoryAdmin({ onClose }: { onClose: () => void }) {
             CUSTOM DESIGN
           </button>
         </nav>
-        {activeSection === 'orders' ? <OrdersAdmin /> : activeSection === 'custom-design' ? <CustomDesignRequestsAdmin /> : (
+        {activeSection === 'orders' ? <OrdersAdmin /> : activeSection === 'shipping' ? <ShippingPackageSettings /> : activeSection === 'custom-design' ? <CustomDesignRequestsAdmin /> : (
           <>
         <p className="admin-warning">
           Set the real available quantity for every product and size. Stock is saved in Supabase and shared across

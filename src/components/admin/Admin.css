@@ -332,6 +332,67 @@
   overflow-wrap: anywhere;
 }
 
+.shipping-package-settings {
+  margin: 18px 0;
+}
+
+.shipping-package-settings > header > h3 {
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+}
+
+.shipping-package-settings > header > p,
+.shipping-package-presets fieldset > p {
+  color: var(--c-text-dim);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.shipping-package-presets {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.shipping-package-presets fieldset {
+  display: grid;
+  gap: 10px;
+  border: 1px solid var(--c-border);
+  padding: 14px;
+}
+
+.shipping-package-presets legend {
+  padding: 0 6px;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+}
+
+.shipping-package-presets fieldset > p {
+  margin: 0;
+}
+
+.shipping-package-presets label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 9px;
+  letter-spacing: 0.1em;
+}
+
+.shipping-package-presets input {
+  border: 1px solid var(--c-border-input);
+  background: var(--c-bg-input);
+  color: var(--c-text-strong);
+  padding: 9px;
+  font: inherit;
+}
+
+.shipping-package-presets button {
+  justify-self: start;
+}
+
 .orders-admin-print-actions {
   display: flex;
   justify-content: flex-end;
