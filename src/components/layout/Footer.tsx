@@ -31,6 +31,9 @@ export function Footer() {
         <span aria-hidden="true">·</span>
         <a href={`mailto:${CONTACT_EMAIL}`}>CONTACT</a>
       </span>
+      <span className="footer-payment-attribution">
+        Secure payments powered by <span>PayU</span>
+      </span>
     </footer>
   )
 }
